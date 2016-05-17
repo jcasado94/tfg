@@ -1,0 +1,356 @@
+<html lang="en">
+   <head>
+      <meta charset="utf-8">
+      <meta http-equiv="X-UA-Compatible" content="IE=edge">
+      <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="">
+      <meta name="author" content="">
+      <link rel="icon" href="../../favicon.ico">
+      <title>Theme Template for Bootstrap</title>
+      <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+      <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css" integrity="sha384-fLW2N01lMqjakBkx3l/M9EahuwpSfeNvV63J5ezn3uZzapT0u7EYsXMjQV+0En5r" crossorigin="anonymous">
+      <link href="static/css/ie10-viewport-bug-workaround.css" rel="stylesheet">
+      <link href="static/css/theme.css" rel="stylesheet">
+      <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+      <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+      <script src="static/js/funcs.js"></script>
+   </head>
+   <body>
+      <nav class="navbar navbar-inverse navbar-fixed-top">
+         <div class="container">
+            <div class="navbar-header">
+               <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+               <span class="sr-only">Toggle navigation</span>
+               <span class="icon-bar"></span>
+               <span class="icon-bar"></span>
+               <span class="icon-bar"></span>
+               </button>
+               <a class="navbar-brand" href="#">Bootstrap theme</a>
+            </div>
+            <div id="navbar" class="navbar-collapse collapse">
+               <ul class="nav navbar-nav">
+                  <li class="active"><a href="#">Home</a></li>
+                  <li><a href="#about">About</a></li>
+                  <li><a href="#contact">Contact</a></li>
+                  <li class="dropdown">
+                     <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Dropdown <span class="caret"></span></a>
+                     <ul class="dropdown-menu">
+                        <li><a href="#">Action</a></li>
+                        <li><a href="#">Another action</a></li>
+                        <li><a href="#">Something else here</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li class="dropdown-header">Nav header</li>
+                        <li><a href="#">Separated link</a></li>
+                        <li><a href="#">One more separated link</a></li>
+                     </ul>
+                  </li>
+               </ul>
+            </div>
+         </div>
+      </nav>
+      <div class="container-fluid container-main-adds">
+         <div class="row-fluid">
+            <div class="span2 adds-container well">
+               Adds
+            </div>
+            <div class="span10 main-container well">
+               <div class="container-fluid">
+                  <div class="row-fluid">
+                     <div class="span2 main-container-left">
+                        <div class="well">
+                           Search info / Change search
+                        </div>
+                        <div class="well" style="height:500px;">
+                           Filtering options
+                        </div>
+                     </div>
+                     <div class="span10 main-container-right">
+                        <div class="well">
+                           Sorting options
+                        </div>
+                        <div class="trip-container container-fluid">
+                           <div class="row-fluid" id="trips">
+                              <div class="span12 well trip">
+                                 <div class="trip-dep-arr-container container">
+                                    <div class="row">
+                                       <div class="col-md-6 col-dep-arr col-md-offset-3">
+                                          <div class="dep-arr-content">
+                                             <div class="transportation-dep-arr text-center">
+                                                <div class="transp-img transp-img-transp"><img class="img-responsive" src="static/assets/bus.png"></div>
+                                             </div>
+                                          </div>
+                                       </div>
+                                       <div class="col-md-3"></div>
+                                    </div>
+                                    <div class="row">
+                                       <div class="col-md-3">
+                                          <div class="hour-dep-arr"><b>18:00</b><br><small>18/05</small></div>
+                                       </div>
+                                       <div class="col-md-6 line"></div>
+                                       <div class="col-md-3">
+                                          <div class="hour-dep-arr"><b>07:15</b><br><small>19/05</small></div>
+                                       </div>
+                                    </div>
+                                 </div>
+                                 <div class="trip-price-container">
+                                    <div class="trip-price text-center">
+                                       <div class="price">1.950$<br></div>
+                                       <div class="price-per-adult">(975$ p/persona)</div>
+                                    </div>
+                                    <div class="btn-price-container">
+                                       <button type="button" class="btn btn-success btn-price" data-toggle="modal" data-target="#myModal0">Ver</button>
+                                       <div class="modal fade" id="myModal0" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+                                          <div class="modal-dialog" role="document">
+                                             <div class="modal-content">
+                                                <div class="modal-header">
+                                                   <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>                        
+                                                   <h4 class="modal-title" id="myModalLabel"><b>Bahia Blanca</b> a <b>Cordoba</b></h4>
+                                                </div>
+                                                <div class="modal-body">
+                                                   <div class="row" style="background-color:#F0F0F0">
+                                                      <div class="span12">
+                                                         <div class="trip-dep-arr-container container">
+                                                            <div class="row title-row">
+                                                               <img src="static/assets/bus.png">
+                                                               <div class="line"></div>
+                                                               <p>T.u.s. <small>(Semicama)</small></p>
+                                                            </div>
+                                                            <div class="row">
+                                                               <div class="col-md-12" style="text-align: center">
+                                                                  <p style="margin:2px">18:00   -   07:15 <small>(+1)</small></p>
+                                                               </div>
+                                                            </div>
+                                                            <div class="row">
+                                                               <div class="col-md-3">
+                                                                  <div class="hour-dep-arr"><b>Bahia Blanca</b><br><small>(Bahia Blanca)</small></div>
+                                                               </div>
+                                                               <div class="col-md-6 line"></div>
+                                                               <div class="col-md-3">
+                                                                  <div class="hour-dep-arr"><b>Cordoba</b><br><small>(Terminal de Cordoba)</small></div>
+                                                               </div>
+                                                            </div>
+                                                         </div>
+                                                         <div class="trip-price-container">
+                                                            <div class="price">1.950$<br></div>
+                                                            <div class="price-per-adult">(975$ p/persona)</div>
+                                                            <form action="http://www.plataforma10.com/ar/Servicios#buscar/556/19/18-05-2016" method="POST" target="_blank"><button type="submit" class="btn btn-info btn-price">Comprar</button>                                </form>
+                                                         </div>
+                                                      </div>
+                                                   </div>
+                                                </div>
+                                                <div class="modal-footer">                        <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>                      </div>
+                                             </div>
+                                          </div>
+                                       </div>
+                                    </div>
+                                 </div>
+                              </div>
+                              <div class="span12 well trip">
+                                 <div class="trip-dep-arr-container container">
+                                    <div class="row">
+                                       <div class="col-md-6 col-dep-arr col-md-offset-3">
+                                          <div class="dep-arr-content">
+                                             <div class="transportation-dep-arr text-center">
+                                                <div class="transp-img transp-img-transp"><img class="img-responsive" src="static/assets/bus.png"></div>
+                                             </div>
+                                          </div>
+                                       </div>
+                                       <div class="col-md-3"></div>
+                                    </div>
+                                    <div class="row">
+                                       <div class="col-md-3">
+                                          <div class="hour-dep-arr"><b>21:40</b><br><small>18/05</small></div>
+                                       </div>
+                                       <div class="col-md-6 line"></div>
+                                       <div class="col-md-3">
+                                          <div class="hour-dep-arr"><b>10:35</b><br><small>19/05</small></div>
+                                       </div>
+                                    </div>
+                                 </div>
+                                 <div class="trip-price-container">
+                                    <div class="trip-price text-center">
+                                       <div class="price">2.242$<br></div>
+                                       <div class="price-per-adult">(1.121$ p/persona)</div>
+                                    </div>
+                                    <div class="btn-price-container">
+                                       <button type="button" class="btn btn-success btn-price" data-toggle="modal" data-target="#myModal1">Ver</button>
+                                       <div class="modal fade" id="myModal1" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+                                          <div class="modal-dialog" role="document">
+                                             <div class="modal-content">
+                                                <div class="modal-header">
+                                                   <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>                        
+                                                   <h4 class="modal-title" id="myModalLabel"><b>Bahia Blanca</b> a <b>Cordoba</b></h4>
+                                                </div>
+                                                <div class="modal-body">
+                                                   <div class="row" style="background-color:#F0F0F0">
+                                                      <div class="span12">
+                                                         <div class="trip-dep-arr-container container">
+                                                            <div class="row title-row">
+                                                               <img src="static/assets/bus.png">
+                                                               <div class="line"></div>
+                                                               <p>T.u.s. <small>(Cama)</small></p>
+                                                            </div>
+                                                            <div class="row">
+                                                               <div class="col-md-12" style="text-align: center">
+                                                                  <p style="margin:2px">21:40   -   10:35 <small>(+1)</small></p>
+                                                               </div>
+                                                            </div>
+                                                            <div class="row">
+                                                               <div class="col-md-3">
+                                                                  <div class="hour-dep-arr"><b>Bahia Blanca</b><br><small>(Bahia Blanca)</small></div>
+                                                               </div>
+                                                               <div class="col-md-6 line"></div>
+                                                               <div class="col-md-3">
+                                                                  <div class="hour-dep-arr"><b>Cordoba</b><br><small>(Terminal de Cordoba)</small></div>
+                                                               </div>
+                                                            </div>
+                                                         </div>
+                                                         <div class="trip-price-container">
+                                                            <div class="price">2.242$<br></div>
+                                                            <div class="price-per-adult">(1.121$ p/persona)</div>
+                                                            <form action="http://www.plataforma10.com/ar/Servicios#buscar/556/19/18-05-2016" method="POST" target="_blank"><button type="submit" class="btn btn-info btn-price">Comprar</button>                                </form>
+                                                         </div>
+                                                      </div>
+                                                   </div>
+                                                </div>
+                                                <div class="modal-footer">                        <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>                      </div>
+                                             </div>
+                                          </div>
+                                       </div>
+                                    </div>
+                                 </div>
+                              </div>
+                              <div class="span12 well trip">
+                                 <div class="trip-dep-arr-container container">
+                                    <div class="row">
+                                       <div class="col-md-6 col-dep-arr col-md-offset-3">
+                                          <div class="dep-arr-content">
+                                             <div class="transportation-dep-arr text-center">
+                                                <div class="transp-img transp-img-transp"><img class="img-responsive" src="static/assets/bus.png"></div>
+                                             </div>
+                                          </div>
+                                       </div>
+                                       <div class="col-md-3"></div>
+                                    </div>
+                                    <div class="row">
+                                       <div class="col-md-3">
+                                          <div class="hour-dep-arr"><b>20:00</b><br><small>18/05</small></div>
+                                       </div>
+                                       <div class="col-md-6 line"></div>
+                                       <div class="col-md-3">
+                                          <div class="hour-dep-arr"><b>08:15</b><br><small>19/05</small></div>
+                                       </div>
+                                    </div>
+                                 </div>
+                                 <div class="trip-price-container">
+                                    <div class="trip-price text-center">
+                                       <div class="price">1.950$<br></div>
+                                       <div class="price-per-adult">(975$ p/persona)</div>
+                                    </div>
+                                    <div class="btn-price-container">
+                                       <button type="button" class="btn btn-success btn-price" data-toggle="modal" data-target="#myModal2">Ver</button>
+                                       <div class="modal fade" id="myModal2" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+                                          <div class="modal-dialog" role="document">
+                                             <div class="modal-content">
+                                                <div class="modal-header">
+                                                   <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>                        
+                                                   <h4 class="modal-title" id="myModalLabel"><b>Bahia Blanca</b> a <b>Cordoba</b></h4>
+                                                </div>
+                                                <div class="modal-body">
+                                                   <div class="row" style="background-color:#F0F0F0">
+                                                      <div class="span12">
+                                                         <div class="trip-dep-arr-container container">
+                                                            <div class="row title-row">
+                                                               <img src="static/assets/bus.png">
+                                                               <div class="line"></div>
+                                                               <p>Ñandu Del Sur <small>(Semicama)</small></p>
+                                                            </div>
+                                                            <div class="row">
+                                                               <div class="col-md-12" style="text-align: center">
+                                                                  <p style="margin:2px">20:00   -   08:15 <small>(+1)</small></p>
+                                                               </div>
+                                                            </div>
+                                                            <div class="row">
+                                                               <div class="col-md-3">
+                                                                  <div class="hour-dep-arr"><b>Bahia Blanca</b><br><small>(Bahia Blanca)</small></div>
+                                                               </div>
+                                                               <div class="col-md-6 line"></div>
+                                                               <div class="col-md-3">
+                                                                  <div class="hour-dep-arr"><b>Cordoba</b><br><small>(Terminal de Cordoba)</small></div>
+                                                               </div>
+                                                            </div>
+                                                         </div>
+                                                         <div class="trip-price-container">
+                                                            <div class="price">1.950$<br></div>
+                                                            <div class="price-per-adult">(975$ p/persona)</div>
+                                                            <form action="http://www.plataforma10.com/ar/Servicios#buscar/556/19/18-05-2016" method="POST" target="_blank"><button type="submit" class="btn btn-info btn-price">Comprar</button>                                </form>
+                                                         </div>
+                                                      </div>
+                                                   </div>
+                                                </div>
+                                                <div class="modal-footer">                        <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>                      </div>
+                                             </div>
+                                          </div>
+                                       </div>
+                                    </div>
+                                 </div>
+                              </div>
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+            </div>
+         </div>
+      </div>
+      <!--     <script>
+         adults = "2"
+         children11 = "0"
+         children5 = "0"
+         infants = "0"
+         dep = "0"
+         depName = "Bahia Blanca"
+         arr = "5"
+         arrName = "Cordoba"
+         year = "2016"
+         month = "05"
+         day = "18"
+         
+         
+         $.ajax( {
+             type: "POST",
+             url: "/directTrips",
+             data: JSON.stringify({
+                 Year: year,
+                 Month: month,
+                 Day: day,
+                 DepId: dep,
+                 ArrId: arr,
+                 Adults: adults,
+                 Children11: children11,
+                 Children5: children5,
+                 Infants: infants
+             }),
+             contentType: "application/json",
+             success: function (result) {
+                 addCombinations(result, depName, arrName);
+             },
+             error: function (xhr, ajaxOptions, thrownError) {
+                 console.log(xhr.status);
+                 console.log(thrownError);
+             }
+         });
+         </script> -->
+      <script>
+         $(document).ready(function(){
+             var x = document.getElementsByClassName('transportation-dep-arr')
+             var children = $(x[0]).children()
+             var images = children.length
+             var parents = $(x[0]).parents()
+             if (images > 6) {
+                 $(parents[1]).css('margin-top', '25px');
+             }
+         });
+      </script>
+   </body>
+</html>

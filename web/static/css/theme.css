@@ -1,0 +1,438 @@
+body {
+  padding-top: 50px;
+  padding-bottom: 30px;
+}
+
+.theme-dropdown .dropdown-menu {
+  position: static;
+  display: block;
+  margin-bottom: 20px;
+}
+
+.theme-showcase > p > .btn {
+  margin: 5px 0;
+}
+
+.theme-showcase .navbar .container {
+  width: auto;
+}
+
+.change-cities-img-div {
+	padding-top: 28px;
+}
+
+.change-cities-img {
+  margin-left: auto;
+  margin-right: auto;
+  display: block;
+}
+
+.children-label-text {
+  padding-top: 10px;
+  margin: auto;
+  width: 70%;
+}
+
+.input-number {
+  width: 100px;
+}
+
+.children-popover {
+  width: 175px;
+}
+
+.second-row {
+  margin-top: 19px;
+}
+
+.search-button {
+  height:50px; 
+  width: 200px; 
+  display: table;
+  margin: 0 auto;
+}
+
+.caption-cities {
+  display: block;
+  opacity: 0.5;
+}
+
+.alert-style {
+  height: 45px;
+}
+
+.alert-content a, .alert-content p {
+  font-size: 12px;
+}
+
+.adds-container {
+  float:right; 
+  width:15%;
+  height: 500px;
+}
+
+.main-container {
+  margin: 0 auto; 
+  float: left; 
+  width: 82.5%; 
+  margin-right:1.5%
+}
+
+.container-main-adds {
+  margin-top: 100px;
+  margin-right: 10%;
+  margin-left: 10%;
+}
+
+.main-container-left {
+  float:left;
+  width: 25%; 
+  margin-right: 2.5%; 
+}
+
+.main-container-right{
+  margin: 0 auto;
+  height: auto;
+  max-height: 1850px;
+  width: 72.5%; 
+  float:left; 
+}
+
+.sorting-options {
+  height: 50px;
+  margin-bottom:0px;
+  padding:0;
+  position: relative;
+}
+
+.sorting-options-container {
+  margin-left:2%; 
+  margin-right:2%; 
+  display:flex;
+  align-items: center;
+  height:100%;
+}
+
+.sorting-options-container > label {
+  white-space: nowrap;
+  margin-right: 5px;
+  z-index: 2
+}
+
+#number-of-results {
+  float:left; 
+  width: 25%;
+}
+
+#running-search {
+  min-width:50%;
+  display:inline-block;
+  text-align:center
+}
+
+#sorting-option {
+  float:right;
+  width: 25%; 
+  text-align:right;
+}
+
+.sorting-options-progress {
+  background-color:rgba(218, 255, 216, .2);
+  position:absolute;
+  /*bottom:0;*/
+  top:0;
+  left:0;
+  /*right:0;*/
+  width:0%;
+  height:100%;
+  z-index:1
+}
+
+.filter-option {
+  display:none;
+  margin-bottom: 20px;
+  border-top: 1px solid #CCC;
+  padding-top: 10px;
+}
+
+.filter-option > div {
+  margin-top: 10px;
+}
+
+.filter-option label{
+  font-weight:normal;
+  margin-left: 10px;
+  display: block
+}
+
+.filter-option label > span {
+    margin-left: 3px
+}
+
+/*.filter-option input {
+  width:100%;
+}*/
+
+.search-info {
+  height: auto;
+  padding: 0
+}
+
+.search-info > ul {
+  text-align: center;
+  list-style: none; 
+  padding:0;
+  margin-left:10px;
+  margin-right:10px;
+  margin-top:10px;
+}
+
+.search-date {
+  margin-top:15px; 
+  text-align: center;
+  font-size: 14px;
+  background-color:#DEDEDE;
+}
+
+.search-date > button {
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+.change-search {
+  margin-top: 15px;
+}
+
+.change-search-class {
+  display: none;
+  width: 100%;
+  border-top: 1px solid #CCC;
+  margin-top: 20px;
+  justify-content: center;
+}
+
+.change-search-class .col-md-7 {
+  padding-right:0
+}
+
+.change-search-class .col-md-5 {
+  padding-left:0
+}
+
+.change-search-class .row .button-row {
+  margin-top:32px
+}
+
+.change-search-class li {
+  margin-top: 15px; 
+}
+
+.change-search-class > ul {
+  list-style: none; 
+  padding:0;
+  margin-left:10px;
+  margin-right:10px;
+  margin-top:10px;
+}
+
+#change-search-close {
+  display:none;
+  width: 100%;
+}
+
+#change-search-close > button {
+  width: 100%;
+}
+
+.trip {
+  height: 150px;
+  width: auto;
+  margin-bottom: 20px;
+  border: 1px solid #CCC;
+  padding: 0;
+}
+
+.trip-dep-arr-container {
+  border-right: 1px solid #CCC;
+  float:left;
+  width:75%;
+  height: 100%;
+}
+
+.trip-dep-arr-container > .row > .col-md-3 {
+  max-height: 80px;
+}
+
+.col-dep-arr {
+  margin-top: 50px;
+}
+
+.trip-price-container {
+  float: right;
+  width: 25%;
+  height: 100%;
+  display: flex; 
+  flex-direction: column;
+  text-align: center;
+}
+
+.trip-price {
+  margin: 0 auto;
+  width: 95%;
+}
+
+.trip-container {
+  padding: 0px;
+  height:auto;
+  max-height: 1700px;
+}
+
+.hour-dep-arr {
+  font-size: 20px;
+  text-align: center;
+  transform: translateY(-50%);
+}
+
+.line {
+  height:2px;
+  background-color:#BBB;
+}
+
+.transp-img {
+  height:100%;
+  display: inline-block;
+  margin-right: 2px!important;
+  margin-left: 2px!important;
+}
+
+.transp-img-transp {
+  width: 13%;
+}
+
+.transp-img-sum {
+  width: 10%;
+}
+
+.price {
+  font-size: 20px;
+  margin-top: 10px;
+  font-weight: bold;
+}
+
+.price-per-adult {
+  font-size: 14px;
+}
+
+.btn-price-container {
+  flex: 1; 
+  display: -ms-flexbox;
+  display: -webkit-flex;
+  display: flex;
+
+  -ms-flex-align: center;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-price {
+  margin-top: 20px;
+}
+
+.modal {
+  text-align: left;
+}
+
+.modal-title{
+  text-align: center;
+}
+
+.modal-body > .row {
+  /*margin-top: 20px;*/
+  border-top: 1px solid #DDD;
+  height: 175px;
+  margin-right: 0px;
+  margin-left: 0px;
+}
+
+.modal-body > .row > .span12 > .trip-dep-arr-container {
+  border-right: 0;
+}
+
+.title-row {
+  margin-top: 10px;
+  margin-bottom: 30px;
+  text-align: center;
+/*  align-content: center;*/
+}
+
+.title-row div, .title-row p {
+  display: inline-block;
+}
+
+.title-row .line {
+  margin-left:10px;
+  margin-right:10px; 
+  margin-bottom:3px; 
+  width:20px; 
+  display: inline-block;
+  background-color:#777;
+}
+
+.modal-body .trip-price-container {
+  margin-top: 35px;
+  border-left: 1px solid #DDD;
+  text-align: center;
+}
+
+.modal-body .price {
+  margin-top: 0px;
+}
+
+.modal-body .hour-dep-arr {
+  font-size: 14px;
+}
+
+.modal-body {
+  padding: 0px;
+}
+
+.modal-header {
+  border-bottom: 0;
+}
+
+.waitingForTripsModal {
+    display:    none;
+    z-index:    1000;
+    height:     200px;
+    width:      100%;
+    background: rgba( 255, 255, 255, .0 ) 
+                url('../assets/waitingForTrips.gif') 
+                50% 50% 
+                no-repeat;
+}
+
+.main-container-right.waitingForTripsLoading, .filtering-options.waitingForTripsLoading {
+    overflow: hidden;   
+}
+
+
+.main-container-right.waitingForTripsLoading .waitingForTripsModal, .filtering-options.waitingForTripsLoading .waitingForTripsModal {
+    display: block;
+}
+
+.pages > .pagination {
+  margin-top: 5px;
+}
+
+.pages {
+  display: flex;
+  justify-content: center;
+}
+
+input[type="radio"]{
+    vertical-align: middle;
+    margin-top: 0px;
+}

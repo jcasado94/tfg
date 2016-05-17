@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="../../favicon.ico">
+
+    <title>Theme Template for Bootstrap</title>
+
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css" integrity="sha384-fLW2N01lMqjakBkx3l/M9EahuwpSfeNvV63J5ezn3uZzapT0u7EYsXMjQV+0En5r" crossorigin="anonymous">
+
+        <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <link href="static/css/ie10-viewport-bug-workaround.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="static/css/theme.css" rel="stylesheet">
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <!-- jQuery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+    
+    <script src="static/js/neo4j.js"></script>
+
+    <!-- datepicker -->
+    <link rel="stylesheet" type="text/css" href="static/css/bootstrap-datepicker3.min.css" />
+    <script type="text/javascript" src="static/js/bootstrap-datepicker.min.js"></script>
+    <script type="text/javascript" src="static/js/bootstrap-datepicker.es.min.js"></script>
+
+    <!-- Selectize -->
+    <link rel="stylesheet" href="static/css/selectize.css" />
+    <link rel="stylesheet" href="static/css/selectize.bootstrap3.css" />
+    <script src="static/js/selectize.min.js"></script>
+
+    <!-- Touchspin -->
+    <script type="text/javascript" src="static/js/jquery.bootstrap-touchspin.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="static/css/jquery.bootstrap-touchspin.min.css" />
+
+    <!-- BOOTPAG -->
+    <script src="static/js/bootpag.min.js"></script>
+
+    <!-- VELOCITY -->
+    <script src="static/js/velocity.min.js"></script>
+
+    <!-- SLIDER -->
+    <script src="static/js/bootstrap-slider.min.js"></script>
+    <link href="static/css/bootstrap-slider.min.css" rel="stylesheet"></head>
+
+    <script src="static/js/funcs.js"></script>
+
+  </head>
+  <body>
+
+    <!-- Fixed navbar -->
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="#">Bootstrap theme</a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+            <li class="active"><a href="#">Home</a></li>
+            <li><a href="#about">About</a></li>
+            <li><a href="#contact">Contact</a></li>
+            <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Dropdown <span class="caret"></span></a>
+              <ul class="dropdown-menu">
+                <li><a href="#">Action</a></li>
+                <li><a href="#">Another action</a></li>
+                <li><a href="#">Something else here</a></li>
+                <li role="separator" class="divider"></li>
+                <li class="dropdown-header">Nav header</li>
+                <li><a href="#">Separated link</a></li>
+                <li><a href="#">One more separated link</a></li>
+              </ul>
+            </li>
+          </ul>
+        </div><!--/.nav-collapse -->
+      </div>
+    </nav>
+
+    <div class="container-fluid container-main-adds">
+      <div class="row-fluid">
+        <div class="span2 adds-container well">
+            Adds
+          <!--Sidebar content-->
+        </div>
+        <div class="span10 main-container well">
+            <div class="container-fluid">
+                <div class="row-fluid">
+                    <div class="span2 main-container-left">
+                        <div class="well search-info">
+                            <ul>
+                                <li id="dep-city"></li>
+                                <li>a</li>
+                                <li id="arr-city"></li>
+                            </ul>
+                            <div class="search-date">
+                                <button type="button" class="btn btn-xs" onclick="prevDay()" style="float:left"><span class="glyphicon glyphicon-chevron-left"></span>&nbsp;</button>
+                                <span id="dep-date-info"></span>&nbsp;
+                                <button type="button" class="btn btn-xs" onclick="nextDay()" style="float:right"><span class="glyphicon glyphicon-chevron-right"></span>&nbsp;</button>
+                            </div>
+                            <button type="button" id="change-search" class="btn btn-info" style="width:100%; margin-top:10px" onclick="showChangeSearch()">Cambiar búsqueda</button>
+                            <div class="change-search-class form-group">
+                                <ul>
+                                    <li>
+                                        <!-- <label for="select-orig-city" class="form-control-label"><small>Desde:</small></label> -->
+                                        <select class="form-control" id="select-orig-city" placeholder="Ciudad de origen" style="background: transparent" >
+                                          <option value="">Ciudad de origen</option>
+                                        </select>
+                                    </li>
+                                    <li>
+                                        <input type="image" src="static/assets/change_cities_up.png" class="change-cities-img" onclick="swapCities(); return false;"/>
+                                    </li>
+                                    <li>
+                                        <!-- <label for="select-dest-city" class="form-control-label"><small>A:</small></label> -->
+                                        <select class="form-control" id="select-dest-city" placeholder="Ciudad de destino">
+                                          <option value="">Ciudad de destino</option>
+                                        </select>
+                                    </li>
+                                    <li>
+                                      <div id="dep-date-container">
+                                        <input id="dep-date" type="text" class="form-control">
+                                      </div>
+                                    </li>
+                                    <li>
+                                        <div class="row">
+                                            <div class="col-md-8">
+                                                <label for="adults" class="form-control-label" style=" font-size: 12px; height: 24px">Adultos (12+)</label>
+                                                <div class="input-number">
+                                                    <input id="adults" type="text" style="text-align: center;" value="" class="spintouch-adults">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4" style="padding-left:0">
+                                                <button type="button" id="children" class="btn btn-default button-row">+</button>
+                                                <div id="childrenForm" class="hide">
+                                                    <div>
+                                                      <div class="children-label-text">
+                                                        <label for="children5">5 - 11 años</label>
+                                                        <div class="input-number">
+                                                          <input id="children5" type="text" value="0" >
+                                                        </div>
+                                                      </div>
+                                                      <div class="children-label-text">
+                                                        <label for="children2">2 - 4 años</label>
+                                                        <div class="input-number">
+                                                          <input id="children2" type="text" value="0">
+                                                        </div>
+                                                      </div>
+                                                      <div class="children-label-text">
+                                                        <label for="infants">0 - 1 año</label>
+                                                        <div class="input-number">
+                                                          <input id="infants" type="text" value="0">
+                                                        </div>
+                                                        <br>
+                                                      </div>
+                                                      <div id="alert-children">
+                                                      </div>
+                                                    </div>
+                                                </div> 
+                                            </div>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <button class="btn btn-success" style="width:100%" onclick="changeSearch()">Buscar</button>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div id="change-search-close">
+                                <button type="button" class="btn btn-info" onclick="hideChangeSearch()">
+                                    <span class="glyphicon glyphicon glyphicon-menu-up"></span>&nbsp;
+                                </button>
+                            </div>
+                        </div>
+                        <div class="well filtering-options">
+                            <div class="filter-option">
+                                <strong>Precio máximo</strong>
+                                <div>
+                                    <label for="price-filter"><small><span id="min-price"></span> - <span id="max-price"></span></small></label>
+                                    <div><input id="price-filter" type="text" data-slider-step="1" style="width:100%"/></div>
+                                </div>
+                            </div>
+                            <div class="filter-option">
+                                <strong>Hora de salida</strong>
+                                <div>
+                                    <label for="dep-hour-filter"><small><span id="min-dep-hour"></span> - <span id="max-dep-hour"></span></small></label>
+                                    <div><input id="dep-hour-filter" type="text" data-slider-step="1" style="width:100%"/></div>
+                                </div>
+                            </div>
+                            <div class="filter-option">
+                                <strong>Quiero llegar...</strong>
+                                <div id="arr-day-filter">
+                                    <label><input type="radio" value="-1" name="arr-day" checked="checked" onclick="updatePagination()"><span>Cuando sea</span></label>
+                                </div>
+                            </div>
+                            <div class="filter-option">
+                                <strong>Escalas máximas</strong>
+                                <div>
+                                    <label for="transfers-filter" style="text-align: center"><small><span id="max-transfers"></span></small></label>
+                                    <div><input id="transfers-filter" type="text" data-slider-step="1" style="width:100%"/></div>
+                                </div>
+                            </div>
+                            <div class="waitingForTripsModal"></div>
+                        </div>
+                    </div>
+                    <div class="span10 main-container-right">
+                        <div class="well sorting-options">
+                            <!-- Sorting options -->
+                            <div class="sorting-options-container">
+                                <div id="number-of-results"></div>
+                                <div id="running-search"><em>Buscando enlaces directos... (1/3)</em></div>
+                                <label for="sorting"><small>Ordenar por</small></label>
+                                <div id="sorting-option">
+                                    <select class="form-control input-sm" id="sorting" onchange="sortAgain()">
+                                        <option value="0">Precio total</option>
+                                        <option value="1">Precio por adulto</option>
+                                        <option value="2">Salida</option>
+                                        <option value="3">Llegada</option>
+                                        <option value="4">Escalas</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="sorting-options-progress"></div>
+                        </div>
+                        <div class="pages">
+                                <ul class="pagination bootpag">
+                                </ul>
+                        </div> 
+                        <div class="waitingForTripsModal"></div> 
+                        <div class="trip-container container-fluid">
+                            <div class="row-fluid" id="trips">
+                            </div>
+                        </div>
+                        <div class="pages">
+                            <ul class="pagination bootpag">
+                            </ul>
+                        </div> 
+                    </div>
+                </div>
+            </div>
+          <!--Body content-->
+        </div>
+      </div>
+    </div>
+
+    <script>
+        // search change
+        getCities(
+
+          function(response) {
+
+            json = JSON.parse(response);
+
+            var optionsSer = []
+
+            for (i = 0; i < json.length; i++) {
+              id = json[i].Id
+              name = json[i].Name
+              optionsSer.push({id: id, city: name})
+            }
+
+            $('#select-orig-city').selectize({
+              valueField: 'id',
+              labelField: 'city',
+              searchField: ['city'],
+              sortField: 'city',
+              highlight: false,
+              options: optionsSer,
+
+               render: {
+                  item: function(item, escape) {
+                    var split = item.city.split("(");
+                    var city = split[0].trim();
+                    return '<div style="font-size: 11px">' +
+                        escape(city.toUpperCase()) + 
+                    '</div>';
+                  },
+                  option: function(item, escape) {
+                    var split = item.city.split("(");
+                    var city = split[0].trim();
+                    var state = split[1].split(")")[0].trim()
+                    return '<div>' + '<span class="label-cities">' + 
+                        escape(city) + '</span>' + '<span class="caption-cities"><small>'
+                         + escape(state) + '</small></span>' +
+                    '</div>';
+                  }
+              }, 
+
+              onChange: function(value) {
+                if (!value.length) return;
+              }
+            });
+
+            $('#select-dest-city').selectize({
+              valueField: 'id',
+              labelField: 'city',
+              searchField: ['city'],
+              sortField: 'city',
+              highlight: false,
+              options: optionsSer,
+
+              render: {
+                  item: function(item, escape) {
+                    var split = item.city.split("(");
+                    var city = split[0].trim();
+                    return '<div style="font-size: 11px">' +
+                        escape(city.toUpperCase()) + 
+                    '</div>';
+                  },
+                  option: function(item, escape) {
+                    var split = item.city.split("(");
+                    var city = split[0].trim();
+                    var state = split[1].split(")")[0].trim()
+                    return '<div>' + '<span class="label-cities">' + 
+                        escape(city) + '</span>' + '<span class="caption-cities"><small>'
+                         + escape(state) + '</small></span>' +
+                    '</div>';
+                  }
+              }, 
+
+              onChange: function(value) {
+                if (!value.length) return;
+              }
+            });
+
+          }
+
+    );  
+    </script>
+
+    <script>
+    // datepicker
+
+      $('#dep-date-container input').datepicker({
+        startDate: "d",
+        endDate: "+1y",
+        todayBtn: "linked",
+        language: "es",
+        orientation: "bottom auto",
+        autoclose: true
+    });
+
+    setDepartureDate()
+
+  </script>
+
+    <script>
+        // bootpag
+        $('.pages').bootpag({
+            total: 1,
+            maxVisible: 5
+        }).on("page", function(event, num){
+            pageNumber = num
+            updatePagination()
+        });
+    </script>
+
+    <script>
+        adults = {{.Adults}}
+        children11 = {{.Children11}}
+        children5 = {{.Children5}}
+        infants = {{.Infants}}
+        dep = {{.DepId}}
+        depName = {{.DepName}}
+        arr = {{.ArrId}}
+        arrName = {{.ArrName}}
+        year = {{.Year}}
+        month = {{.Month}}
+        day = {{.Day}}
+
+        sendPosts()
+
+        
+    </script>
+
+    <script>
+        //translate transportation images upper
+        $(document).ready(function(){
+            var x = document.getElementsByClassName('transportation-dep-arr')
+            var children = $(x[0]).children()
+            var images = children.length
+            var parents = $(x[0]).parents()
+            if (images > 6) {
+                $(parents[1]).css('margin-top', '25px');
+            }
+        });
+    </script>
+
+    <script>
+    $('#price-filter').slider({
+            tooltip: 'hide'
+        }).on({
+        change: function(obj){
+            priceFilterChanged = true
+            var price = $(this).val()
+            $('#max-price').html('<strong>'+price+'$</strong>')
+        },
+        slideStop: function(val) {
+            updatePagination()
+        }});
+
+    $('#dep-hour-filter').slider({
+        tooltip: 'hide',
+        value: [0,0]
+    }).on({
+        change: function(obj){
+            depHourFilterChanged = true
+            var depTime = obj.value.newValue
+            var minDepTime = depTime[0]; var maxDepTime = depTime[1]
+            var minDepHour = Math.floor(minDepTime/60); var minDepMin = minDepTime%60
+            var maxDepHour = Math.floor(maxDepTime/60); var maxDepMin = maxDepTime%60
+            $('#min-dep-hour').html('<strong>'+ ("0" + minDepHour).slice(-2) + ':' + ("0" + minDepMin).slice(-2) +'</strong>')
+            $('#max-dep-hour').html('<strong>'+("0" + maxDepHour).slice(-2) + ':' + ("0" + maxDepMin).slice(-2) +'</strong>')
+        },
+        slideStop: function(val) {
+            updatePagination()
+        }});
+
+    $('#transfers-filter').slider({
+        tooltip: 'hide',
+        min: 0
+    }).on({
+        change: function(obj){
+            transfersFilterChange = true
+            var transfers = $(this).val()
+            $('#max-transfers').html(transfers)
+        },
+        slideStop: function(val) {
+            updatePagination()
+        }});
+    </script>
+
+    <script>
+        $(".spintouch-adults").TouchSpin({
+            min: 1,
+            max: 9,
+            stepinterval: 1,
+            initval: 1
+            }).on('change', function() {
+              if ( $('#adults').val() == 1 ) { // min reached, disable '-' button
+                    $('#adults').parent().find('.input-group-btn .bootstrap-touchspin-down').prop('disabled', true);
+                    $('#adults').parent().find('.input-group-btn .bootstrap-touchspin-up').prop('disabled', false);
+                  } else if ( $('#adults').val() == 9 ) { // max reached, disable '+' button
+                    $('#adults').parent().find('.input-group-btn .bootstrap-touchspin-up').prop('disabled', true);
+                    $('#adults').parent().find('.input-group-btn .bootstrap-touchspin-down').prop('disabled', false);
+                  } else { // in the middle, both buttons enabled
+                    $('#adults').parent().find('.input-group-btn .bootstrap-touchspin-up').prop('disabled', false);
+                    $('#adults').parent().find('.input-group-btn .bootstrap-touchspin-down').prop('disabled', false);
+                  }
+              });
+
+          $('#adults').parent().find('.input-group-btn .bootstrap-touchspin-down').prop('disabled', true);
+    </script>
+
+    <script>
+      
+      $('#children').popover({
+          placement: 'bottom',
+          title: 'Niños',
+          html:true,
+          content: function(){
+            return $('#childrenForm').html();
+        }
+
+      }).on({
+        'click': function(){
+
+          showErrorChildren();
+          
+          $("#children5").TouchSpin({
+            min: 0,
+            max: 9,
+            stepinterval: 1,
+            booster: false
+          }).on({
+            'change': function() { 
+              if ( $('.popover-content #children5').val() == 0 ) { // min reached, disable '-' button
+                $('#children5').parent().find('.input-group-btn .bootstrap-touchspin-down').prop('disabled', true);
+                $('#children5').parent().find('.input-group-btn .bootstrap-touchspin-up').prop('disabled', false);
+              } else if ( $('.popover-content #children5').val() == 9 ) { // max reached, disable '+' button
+                $('#children5').parent().find('.input-group-btn .bootstrap-touchspin-up').prop('disabled', true);
+                $('#children5').parent().find('.input-group-btn .bootstrap-touchspin-down').prop('disabled', false);
+              } else { // in the middle, both buttons enabled
+                $('#children5').parent().find('.input-group-btn .bootstrap-touchspin-up').prop('disabled', false);
+                $('#children5').parent().find('.input-group-btn .bootstrap-touchspin-down').prop('disabled', false);
+              }
+            }
+          });
+          if ( $('.popover-content #children5').val() == 0 ) $('#children5').parent().find('.input-group-btn .bootstrap-touchspin-down').prop('disabled', true);
+          $("#children2").TouchSpin({
+            min: 0,
+            max: 9,
+            stepinterval: 1,
+            booster: false,
+          }).on({
+            'change': function() { 
+
+              showErrorChildren();
+
+              if ( $('.popover-content #children2').val() == 0 ) { // min reached, disable '-' button
+                $('#children2').parent().find('.input-group-btn .bootstrap-touchspin-down').prop('disabled', true);
+                $('#children2').parent().find('.input-group-btn .bootstrap-touchspin-up').prop('disabled', false);
+              } else if ( $('.popover-content #children2').val() == 9 ) { // max reached, disable '+' button
+                $('#children2').parent().find('.input-group-btn .bootstrap-touchspin-up').prop('disabled', true);
+                $('#children2').parent().find('.input-group-btn .bootstrap-touchspin-down').prop('disabled', false);
+              } else { // in the middle, both buttons enabled
+                $('#children2').parent().find('.input-group-btn .bootstrap-touchspin-up').prop('disabled', false);
+                $('#children2').parent().find('.input-group-btn .bootstrap-touchspin-down').prop('disabled', false);
+              }
+            }
+          });
+          if ( $('.popover-content #children2').val() == 0 ) $('#children2').parent().find('.input-group-btn .bootstrap-touchspin-down').prop('disabled', true);
+          $("#infants").TouchSpin({
+            min: 0,
+            max: $("#adults").val(),
+            stepinterval: 1,
+            booster: false
+          }).on({
+            'change': function() { 
+
+              showErrorChildren();
+
+              if ( $('.popover-content #infants').val() == 0 ) { // min reached, disable '-' button
+                $('#infants').parent().find('.input-group-btn .bootstrap-touchspin-down').prop('disabled', true);
+                $('#infants').parent().find('.input-group-btn .bootstrap-touchspin-up').prop('disabled', false);
+              } else if ( $('.popover-content #infants').val() == $("#adults").val() ) { // max reached, disable '+' button
+                $('#infants').parent().find('.input-group-btn .bootstrap-touchspin-up').prop('disabled', true);
+                $('#infants').parent().find('.input-group-btn .bootstrap-touchspin-down').prop('disabled', false);
+              } else { // in the middle, both buttons enabled
+                $('#infants').parent().find('.input-group-btn .bootstrap-touchspin-up').prop('disabled', false);
+                $('#infants').parent().find('.input-group-btn .bootstrap-touchspin-down').prop('disabled', false);
+              }
+            }
+          });
+          if ( $('.popover-content #infants').val() == 0 ) $('#infants').parent().find('.input-group-btn .bootstrap-touchspin-down').prop('disabled', true);
+        },
+
+        'hide.bs.popover': function () {
+          // save values
+          var currVal = $('.popover-content #children5').val();
+          $('#childrenForm #children5').attr('value', currVal);
+
+          currVal = $('.popover-content #children2').val();
+          $('#childrenForm #children2').attr('value', currVal);
+
+          currVal = $('.popover-content #infants').val();
+          $('#childrenForm #infants').attr('value', currVal);
+
+      },
+
+      'hidden.bs.popover': function() {
+        // fix double-click bug
+        $('#children').data("bs.popover").inState = { click: false, hover: false, focus: false }
+      }
+    })
+    .data('bs.popover')
+    .tip()
+      .addClass('children-popover');
+
+    </script>
+
+    <script>
+
+      // make children popover closable on clicking outside it
+
+      $(document).on("click", function (e) {
+
+        var $target = $(e.target),
+          isPopover = $(e.target).is('#children'),
+          inPopover = $(e.target).closest('.popover').length > 0
+
+          if (!isPopover && !inPopover) {
+            $('#children').popover('hide');
+          }
+
+        });
+
+    </script>
+
+    <script>
+      $(".spintouch-adults").TouchSpin({
+        min: 1,
+        max: 9,
+        stepinterval: 1,
+        initval: 1
+        }).on('change', function() {
+          if ( $('#adults').val() == 1 ) { // min reached, disable '-' button
+                $('#adults').parent().find('.input-group-btn .bootstrap-touchspin-down').prop('disabled', true);
+                $('#adults').parent().find('.input-group-btn .bootstrap-touchspin-up').prop('disabled', false);
+              } else if ( $('#adults').val() == 9 ) { // max reached, disable '+' button
+                $('#adults').parent().find('.input-group-btn .bootstrap-touchspin-up').prop('disabled', true);
+                $('#adults').parent().find('.input-group-btn .bootstrap-touchspin-down').prop('disabled', false);
+              } else { // in the middle, both buttons enabled
+                $('#adults').parent().find('.input-group-btn .bootstrap-touchspin-up').prop('disabled', false);
+                $('#adults').parent().find('.input-group-btn .bootstrap-touchspin-down').prop('disabled', false);
+              }
+          });
+
+      $('#adults').parent().find('.input-group-btn .bootstrap-touchspin-down').prop('disabled', true);
+
+    </script>
+
+  </body>
+</html>
