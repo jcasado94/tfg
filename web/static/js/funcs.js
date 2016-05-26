@@ -277,9 +277,9 @@ function updatePriceFilter(minPrice, maxPrice) {
 	var max = Math.floor(maxPrice)
 	slider.slider('setAttribute','min', min)
 	slider.slider('setAttribute','max', max)
-	$('#min-price').html('<strong>'+min+'$</strong>')
+	$('#min-price').html('<strong>'+addPoints(min)+'$</strong>')
 	if (!priceFilterChanged) { 
-		$('#max-price').html('<strong>'+ max +'$</strong>')
+		$('#max-price').html('<strong>'+ addPoints(max) +'$</strong>')
 		 slider.slider('setValue', max)
 	}
 }
@@ -785,7 +785,10 @@ function increaseProgressBar(ind) {
 
 		// check if there are trips in the div. If there aren't, print a message.
 		if (length == 0) {
-			htmlCurrentTrips.innerHTML = '<div class="span12 well">Lo sentimos, no se han encontrado combinaciones para este viaje!</div>'
+			$(".main-container-right").removeClass("waitingForTripsLoading")
+			$('.filtering-options').removeClass("waitingForTripsLoading")
+			document.getElementById('trips').innerHTML = '<div class="span12 well"><p class="text-warning" style="text-align: center">Lo sentimos, no se han encontrado combinaciones para este viaje!</br> \
+																																		Haz <a href="/index" class="text-warning"><strong>click</strong></a> para volver al inicio</p></div>'
 		}
 
 	}

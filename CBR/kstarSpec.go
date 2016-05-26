@@ -30,7 +30,14 @@ func (ks Kstar) Len() int { return len(ks.openD) }
 
 func (ks Kstar) Empty() bool { return len(ks.openD) == 0 }
 
-func (ks KstarSpec) Less(i, j int) bool {
+// func (ks KstarSpec) Less(i, j int) bool {
+// 	iDist := ks.openD[i].dist
+// 	jDist := ks.openD[j].dist
+
+// 	return iDist < jDist
+// }
+
+func (ks Kstar) Less(i, j int) bool {
 	iDist := ks.openD[i].dist
 	jDist := ks.openD[j].dist
 

@@ -14,11 +14,11 @@ type KstarGen struct {
 	H   *UsualCombinationsHandler
 }
 
-func (ks KstarGen) Less(i, j int) bool {
-	iDist, jDist := ks.openD[i].dist, ks.openD[j].dist
+// func (ks KstarGen) Less(i, j int) bool {
+// 	iDist, jDist := ks.openD[i].dist, ks.openD[j].dist
 
-	return iDist < jDist
-}
+// 	return iDist < jDist
+// }
 
 func (ks KstarGen) GoKStar(dep, arr int) [][][2]int {
 
@@ -306,7 +306,13 @@ func (ks KstarGen) getTetaSeq(node *Node) [][3]int { // {uId, vId, transp}
 	lastNode := node
 
 	for {
-		parent := ks.H.Graph.Parents[lastNode.getHtOrHin()][lastNode.u][lastNode.v][lastNode.transp][lastNode.indParent]
+		a := ks.H.Graph.Parents[lastNode.getHtOrHin()]
+		b := a[lastNode.u]
+		c := b[lastNode.v]
+		d := c[lastNode.transp]
+		// fmt.Println(d)
+		// fmt.Println(lastNode.indParent)
+		parent := d[lastNode.indParent]
 		if parent.v == R {
 			return res
 		}

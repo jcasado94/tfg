@@ -24,20 +24,6 @@ type GraphGen struct {
 	H *UsualCombinationsHandler
 }
 
-func (g GraphGen) GetPath() []int {
-	v := g.Cities[g.ArrId]
-	var path = []int{g.ArrId}
-	for v.Id != g.DepId {
-		v = g.Cities[v.CameFrom]
-		path = append(path, v.Id)
-	}
-	var res []int
-	for i := len(path) - 1; i >= 0; i-- {
-		res = append(res, path[i])
-	}
-	return res
-}
-
 func (g *GraphGen) createHt(i int) {
 	// newMap := make(map[int]map[int]int)
 	var newHt Ht

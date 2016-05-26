@@ -36,10 +36,9 @@ type GraphSpec struct {
 	/*
 		notice that a node can't be in a hin and a ht, except for the hin roots, but those we just treat them like ht's.
 	*/
-	Closed   map[int]map[int]map[int]bool    // dijkstra's closed vertices. [hin||ht][u][v]
-	Dists    map[int]map[int]map[int]float64 // dijkstra's vertex dinstances. [hin||ht][u][v]
-	Explored map[int]map[int]map[int]bool    // dijkstra's explored vertices (in the search list but no yet closed). [hin||ht][u][v]
-	Parents  map[int]map[int]map[int][]Node  // links to parents of nodes [hin||ht][u][v]. Note that a node might have various parents.
+	Closed   map[int]map[int]map[int]bool   // dijkstra's closed vertices. [hin||ht][u][v]
+	Explored map[int]map[int]map[int]bool   // dijkstra's explored vertices (in the search list but no yet closed). [hin||ht][u][v]
+	Parents  map[int]map[int]map[int][]Node // links to parents of nodes [hin||ht][u][v]. Note that a node might have various parents.
 
 	H *SameDayCombinationsHandler
 }
@@ -78,20 +77,6 @@ func (g GraphSpec) GetRel(rel *neoism.Relationship) Rel {
 
 	return newRel
 
-}
-
-func (g GraphSpec) GetPath() []int {
-	v := g.Rels[END_ID]
-	var path = []int{END_ID}
-	for v.Id != START_ID {
-		v = g.Rels[v.CameFrom]
-		path = append(path, v.Id)
-	}
-	var res []int
-	for i := len(path) - 1; i >= 0; i-- {
-		res = append(res, path[i])
-	}
-	return res
 }
 
 type Node struct {
