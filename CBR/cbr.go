@@ -3,12 +3,14 @@ package CBR
 import (
 	"fmt"
 	// "github.com/Professorq/dijkstra"
-	"github.com/jcasado94/tfg/averages"
+	// "github.com/jcasado94/tfg/averages"
 	"github.com/jcasado94/tfg/common"
 	"github.com/jcasado94/tfg/scraping"
 	"github.com/jmcvetta/neoism"
 	"net/http"
 	// "runtime/debug"
+	// "encoding/gob"
+	// "os"
 	"sort"
 	"strconv"
 	"sync"
@@ -75,6 +77,14 @@ type SameDayCombinationsHandler struct {
 	Astar    AstarSpec
 	Location *time.Location
 	Db       *neoism.Database
+}
+
+func a(h SameDayCombinationsHandler, n int) {
+	c := h.Graph.Rels[n]
+	fmt.Print("(" + strconv.Itoa(c.Id) + ") ")
+	if h.Graph.Rels[c.CameFrom].Id != START_ID {
+		a(h, c.CameFrom)
+	}
 }
 
 func (h SameDayCombinationsHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -223,7 +233,7 @@ func DirectTrips(year, month, day, adults, children11, children5, infants, depId
 	for _, trip := range res {
 		solsAverages = append(solsAverages, []common.Trip{trip})
 	}
-	averages.RetainAverage(depId, arrId, solsAverages)
+	// averages.RetainAverage(depId, arrId, solsAverages)
 
 	return res
 
@@ -248,6 +258,31 @@ func (h *UsualCombinationsHandler) RetrieveGeneralSolutions(year, month, day, de
 	h.Kstar.H = h
 
 	paths := h.Kstar.GoKStar(intDepId, intArrId)
+
+	// var a []float64
+	// dataFile, _ := os.Open("genTimes.gob")
+	// dataDecoder := gob.NewDecoder(dataFile)
+	// _ = dataDecoder.Decode(&a)
+	// dataFile.Close()
+	// a = append(a, h.Astar.seconds)
+	// dataFile, err = os.Create("genTimes.gob")
+	// common.PanicErr(err)
+	// dataEncoder := gob.NewEncoder(dataFile)
+	// dataEncoder.Encode(a)
+	// dataFile.Close()
+	// var b int
+	// dataFile, _ = os.Open("genInconsistent.gob")
+	// dataDecoder = gob.NewDecoder(dataFile)
+	// _ = dataDecoder.Decode(&b)
+	// dataFile.Close()
+	// if !h.Astar.consistent {
+	// 	b++
+	// }
+	// dataFile, err = os.Create("genInconsistent.gob")
+	// common.PanicErr(err)
+	// dataEncoder = gob.NewEncoder(dataFile)
+	// dataEncoder.Encode(b)
+	// dataFile.Close()
 
 	var relPaths [][]rel
 
@@ -284,7 +319,7 @@ func (h *UsualCombinationsHandler) RetrieveGeneralSolutions(year, month, day, de
 
 	sols = checkPaths(year, month, day, adults, children11, children5, infants, relPaths, db, false)
 
-	averages.RetainAverage(depId, arrId, sols)
+	// averages.RetainAverage(depId, arrId, sols)
 
 	// return sols
 	return sols
@@ -333,8 +368,32 @@ func (h *SameDayCombinationsHandler) RetrieveSpecificSolutions(year, month, day,
 
 	// t1 := time.Now()
 	paths := h.Kstar.GoKStar(intDepId, intArrId)
-	// fmt.Println("KSTAR")
 	// fmt.Println(time.Now().Sub(t1))
+
+	// var a []float64
+	// dataFile, _ := os.Open("specTimes.gob")
+	// dataDecoder := gob.NewDecoder(dataFile)
+	// _ = dataDecoder.Decode(&a)
+	// dataFile.Close()
+	// a = append(a, h.Astar.seconds)
+	// dataFile, err = os.Create("specTimes.gob")
+	// common.PanicErr(err)
+	// dataEncoder := gob.NewEncoder(dataFile)
+	// dataEncoder.Encode(a)
+	// dataFile.Close()
+	// var b int
+	// dataFile, _ = os.Open("specInconsistent.gob")
+	// dataDecoder = gob.NewDecoder(dataFile)
+	// _ = dataDecoder.Decode(&b)
+	// dataFile.Close()
+	// if !h.Astar.consistent {
+	// 	b++
+	// }
+	// dataFile, err = os.Create("specInconsistent.gob")
+	// common.PanicErr(err)
+	// dataEncoder = gob.NewEncoder(dataFile)
+	// dataEncoder.Encode(b)
+	// dataFile.Close()
 
 	var relPaths [][]rel
 
@@ -372,7 +431,7 @@ func (h *SameDayCombinationsHandler) RetrieveSpecificSolutions(year, month, day,
 
 	sols = checkPaths(year, month, day, adults, children11, children5, infants, relPaths, db, true)
 
-	averages.RetainAverage(depId, arrId, sols)
+	// averages.RetainAverage(depId, arrId, sols)
 
 	return sols
 }
@@ -556,9 +615,9 @@ func findPath(sol []common.Trip, sortedTrips [][]common.Trip, solsChan chan []co
 		arrMin := lastTrip.ArrMin
 		nextTrips := sortedTrips[0]
 		for _, nextTrip := range nextTrips {
-			tArr := time.Date(arrYear, time.Month(arrMonth), arrDay, arrHour, arrMin+common.TRANSFER_TIME, 0, 0, location)
+			tArr := time.Date(arrYear, time.Month(arrMonth), arrDay, arrHour, arrMin, 0, 0, location)
 			tDep := time.Date(nextTrip.DepYear, time.Month(nextTrip.DepMonth), nextTrip.DepDay, nextTrip.DepHour, nextTrip.DepMin, 0, 0, location)
-			if tDep.Sub(tArr) > 0 && tDep.Sub(tArr).Hours() <= common.MAX_TRANSFER_HOURS {
+			if tDep.Sub(tArr).Minutes() >= common.TRANSFER_TIME && tDep.Sub(tArr).Hours() <= common.MAX_TRANSFER_HOURS {
 				sol = append(sol, nextTrip)
 				//h.findPath(sol, sortedTrips[1:], solsChan, wg)
 				findPath(sol, sortedTrips[1:], solsChan, wg)

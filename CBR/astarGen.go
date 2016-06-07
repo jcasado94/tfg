@@ -2,8 +2,9 @@ package CBR
 
 import (
 	"container/heap"
+	// "github.com/jcasado94/tfg/common"
+	// "sort"
 	// "fmt"
-	"github.com/jcasado94/tfg/common"
 )
 
 type EdgeGen struct {
@@ -21,7 +22,7 @@ type AstarGen struct {
 
 // if start = true, we would look for arr vertex.
 // if start = false, we iterate until we double the current found vertices.
-func (as *AstarGen) goAStar(arr int, start bool) bool {
+func (as *AstarGen) GoAStar(arr int, start bool) bool {
 
 	i := 0
 	n := len(as.closedVertices) * 2
@@ -32,7 +33,6 @@ func (as *AstarGen) goAStar(arr int, start bool) bool {
 			if i == n {
 				return true
 			}
-			i++
 		}
 
 		current := heap.Pop(as).(AstarNode)
@@ -61,6 +61,7 @@ func (as *AstarGen) goAStar(arr int, start bool) bool {
 
 		as.openVertices[currentId] = false
 		as.closedVertices[currentId] = true
+		i++
 
 		if currentId == arr {
 			if start {
@@ -87,9 +88,7 @@ func (as *AstarGen) goAStar(arr int, start bool) bool {
 			}
 
 			_, cycling := current.Prevs[nextCityId]
-
-			if cycling || currentTransfers == common.MAX_TRANSFERS {
-				// not a good transfer
+			if cycling /*|| currentTransfers == common.MAX_TRANSFERS*/ {
 				continue
 			}
 
@@ -109,8 +108,42 @@ func (as *AstarGen) goAStar(arr int, start bool) bool {
 					heap.Init(&hin)
 				}
 				node := Node{u: currentId, v: nextCityId, dValue: as.gScore[currentId] + weight - as.gScore[nextCityId], hin: nextCityId, transp: transp}
+				pair := len(hin)%2 == 0
 				heap.Push(&hin, node)
-				as.H.Graph.Hins[nextCityId] = hin
+
+				tentativeGScore := as.gScore[currentId] + weight
+				if tentativeGScore < as.gScore[nextCityId] {
+					as.consistent = false
+					// fmt.Println("not consistent")
+				}
+
+				// // check if node addition is interfering with the dijkstra execution
+				add := true
+				if !start {
+					for k := range hin {
+						node := hin[k]
+						if node.u == currentId && node.v == nextCityId && node.transp == transp {
+							if pair && k < len(hin)-2 {
+								for k1 := k + 1; k1 < len(hin); k1++ {
+									if hin[k1].usedInDijkstra {
+										add = false
+									}
+								}
+							} else if k < len(hin)-1 {
+								for k1 := k + 1; k1 < len(hin); k1++ {
+									if hin[k1].usedInDijkstra {
+										add = false
+									}
+								}
+							}
+						}
+					}
+				}
+				if !start && add {
+					as.H.Graph.Hins[nextCityId] = hin
+				} else if start {
+					as.H.Graph.Hins[nextCityId] = hin
+				}
 
 				continue
 			}
@@ -129,14 +162,23 @@ func (as *AstarGen) goAStar(arr int, start bool) bool {
 			nextCity.Transp = transp
 			as.H.Graph.Cities[nextCityId] = nextCity
 
+			newPrevs := make(map[int]bool)
+			for k := range current.Prevs {
+				newPrevs[k] = true
+			}
+			newPrevs[currentId] = true
+
 			if !as.openVertices[nextCityId] {
-				newPrevs := make(map[int]bool)
-				for k := range current.Prevs {
-					newPrevs[k] = true
-				}
-				newPrevs[currentId] = true
 				heap.Push(as, AstarNode{Id: nextCityId, Transfers: currentTransfers + 1, Prevs: newPrevs})
 				as.openVertices[nextCityId] = true
+			} else {
+				// fix the heap
+				for i := range as.pq {
+					if as.pq[i].Id == nextCityId {
+						as.pq[i] = AstarNode{Id: nextCityId, Transfers: currentTransfers + 1, Prevs: newPrevs}
+						heap.Fix(as, i)
+					}
+				}
 			}
 
 		}

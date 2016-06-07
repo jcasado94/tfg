@@ -3,7 +3,6 @@ package CBR
 import (
 	"container/heap"
 	// "fmt"
-	"github.com/jcasado94/tfg/common"
 	"github.com/jmcvetta/neoism"
 	"sort"
 	"time"
@@ -53,8 +52,10 @@ func (g GraphSpec) GetRel(rel *neoism.Relationship) Rel {
 	relId := rel.Id()
 	propsRel, _ := rel.Properties()
 	start, _ := rel.Start()
+	start.Db = Db
 	startId := start.Id()
 	end, _ := rel.End()
+	end.Db = Db
 	endId := end.Id()
 	props, _ := rel.Properties()
 	weight := props["price"].(float64)
@@ -71,7 +72,7 @@ func (g GraphSpec) GetRel(rel *neoism.Relationship) Rel {
 	arrHour := int(propsRel["arrHour"].(float64))
 	arrMin := int(propsRel["arrMin"].(float64))
 	timeDep := time.Date(depYear, time.Month(depMonth), depDay, depHour, depMin, 0, 0, location)
-	timeArr := time.Date(arrYear, time.Month(arrMonth), arrDay, arrHour, arrMin+common.TRANSFER_TIME, 0, 0, location)
+	timeArr := time.Date(arrYear, time.Month(arrMonth), arrDay, arrHour, arrMin, 0, 0, location)
 
 	newRel := Rel{Id: relId, Transp: transp, Weight: weight, DepTime: timeDep, ArrTime: timeArr, ArrNode: endId, DepNode: startId}
 
@@ -88,7 +89,8 @@ type Node struct {
 	ht, htIndex   int
 	dist          float64
 	// parent information
-	indParent int
+	indParent      int
+	usedInDijkstra bool
 }
 
 func getDelta(n *Node, m *Node) float64 {

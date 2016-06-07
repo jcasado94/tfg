@@ -20,13 +20,10 @@ const TRANSFER_TIME = 120
 const MAX_TRANSFER_HOURS = 12
 
 // MAX TRANSFERS
-const MAX_TRANSFERS = 3
+const MAX_TRANSFERS = 5
 
 // NUMBER OF DAYS AWAY FROM DEP DAY FOR SPECIFIC TRIP LOOKUP
 const MAX_DAYS_SPEC = 4
-
-// NUMBER OF PATHS TO LOOK FOR WITH SAME DAY COMBINATIONS
-const K_PATHS = 10
 
 // // PATH TO HTML FILES
 const WEB_HTML_PATH = `D:\Users\Documentos\GOlang\src\github.com\jcasado94\tfg\web\html\`
@@ -55,7 +52,8 @@ func PanicErr(err error) {
 	}
 }
 
-const FILE_AVERAGES = "averages.gob"
+const FILE_SPEC_HEURISTIC = "heuristicSpec.gob"
+const FILE_GEN_HEURISTIC = "heuristicGen.gob"
 
 type AveragePrice struct {
 	N     int

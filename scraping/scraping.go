@@ -295,6 +295,8 @@ func getDayOffersAerolineas(year, month, day, adults, children11, children5, bab
 */
 func getDayOffersLAN(year, month, day, adults, children11, children5, babies, orig, dest string) []common.Trip {
 
+	monthN, _ := strconv.Atoi(month)
+	dayN, _ := strconv.Atoi(day)
 	adultsN, _ := strconv.Atoi(adults)
 	children5N, _ := strconv.Atoi(children5)
 	children11N, _ := strconv.Atoi(children11)
@@ -308,21 +310,13 @@ func getDayOffersLAN(year, month, day, adults, children11, children5, babies, or
 	client := initializeClient()
 
 	myUrl := "http://booking.lan.com/ws/booking/quoting/fares_availability/5.0/rest/get_availability"
-	form := url.Values{}
-	form.Add("adults", adults)
-	form.Add("application", "compra_normal")
-	form.Add("cabin", "Y")
-	form.Add("children", strconv.Itoa(childrenN))
-	form.Add("country", "AR")
-	form.Add("departureDate", year+"-"+month+"-"+day)
-	form.Add("destination", dest)
-	form.Add("infants", babies)
-	form.Add("language", "ES")
-	form.Add("origin", orig)
-	form.Add("portal", "personas")
-	form.Add("roundTrip", "false")
-	form.Add("section", "step2")
 
+	if monthN < 10 {
+		month = "0" + month
+	}
+	if dayN < 10 {
+		day = "0" + day
+	}
 	var jsonStr = []byte(`{"language":"ES","country":"AR","portal":"personas","application":"compra_normal","section":"step2","cabin":"Y","adults":` + adults + `,"children":` + strconv.Itoa(childrenN) + `,"infants":` + babies + `,"roundTrip":false,"departureDate":"` + year + "-" + month + "-" + day + `","origin":"` + orig + `","destination":"` + dest + `"}`)
 	req, _ := http.NewRequest("POST", myUrl, bytes.NewBuffer(jsonStr))
 	req.Header.Set("Content-Type", "application/json")
@@ -494,7 +488,10 @@ func getDayOffersP10(year, month, day, adults, children11, children5, babies, or
 
 	client := initializeClient()
 
-	resp, _ := client.Do(req)
+	resp, err := client.Do(req)
+	if resp == nil || err != nil {
+		return []common.Trip{}
+	}
 	defer resp.Body.Close()
 
 	var foundTrips = make(map[string]map[string]map[string]common.Trip) // [company][depDate][arrDate]price
@@ -730,7 +727,8 @@ func retainGeneralTrips(trips []common.Trip, dep, arr string, transp int) {
 			MATCH (a:City {` + code + `:{depCode}}), (b:City {` + code + `:{arrCode}})
 			MERGE (a)-[r:GEN {transp:{transpOption}}]->(b) 
 			ON MATCH SET r.price = (coalesce(r.price, 0)*coalesce(r.n, 0) + {totalPrice})/(coalesce(r.n, 0)+{trips}),
-			r.n = coalesce(r.n, 0)+{trips}
+			r.n = coalesce(r.n, 0)+{trips} 
+			ON CREATE SET r.price = {totalPrice}/{trips}, r.n = {trips}
 			`,
 		Parameters: neoism.Props{"depCode": dep, "arrCode": arr, "transpOption": transp, "totalPrice": sumPrices, "trips": n},
 	}

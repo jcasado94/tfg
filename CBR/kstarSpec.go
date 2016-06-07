@@ -5,9 +5,13 @@ import (
 	"encoding/gob"
 	// "fmt"
 	"github.com/jcasado94/tfg/common"
+	"github.com/jmcvetta/neoism"
 	"os"
+	"sync"
 	"time"
 )
+
+var mutexSpecHeuristic sync.Mutex
 
 type Kstar struct {
 	openD []Node
@@ -18,6 +22,7 @@ type KstarSpec struct {
 
 	res [][]int
 
+	depId, arrId  int
 	DepartureTime time.Time
 
 	yearsLookup, monthsLookup, daysLookup []int
@@ -70,7 +75,9 @@ func (ks KstarSpec) GoKStar(dep, arr int) [][]int {
 
 	ks.H.initVars(dep, arr)
 
-	succesful := ks.H.Astar.goAStar(arr, true)
+	t1 := time.Now()
+	succesful := ks.H.Astar.GoAStar(arr, true)
+	ks.H.Astar.seconds += time.Now().Sub(t1).Seconds()
 	if !succesful {
 		return [][]int{}
 	}
@@ -154,27 +161,33 @@ func (ks KstarSpec) GoKStar(dep, arr int) [][]int {
 
 func (ks KstarSpec) getFinalPath() [][]int {
 
-	type Pair struct {
-		nextCities map[int]*Pair
-		transps    []int // type of transp of the rels arriving to the city
+	type TranspDay struct {
+		transp int
+		day    int
 	}
 
-	intInSlice := func(a int, sl []int) bool {
+	type Pair struct {
+		nextCities  map[int]*Pair
+		transpsDays []TranspDay // type of transp of the rels arriving to the city
+	}
+
+	inSlice := func(transp int, day int, sl []TranspDay) bool {
 		for _, x := range sl {
-			if x == a {
+			if x.transp == transp && x.day == day {
 				return true
 			}
 		}
 		return false
 	}
 
-	var mainCity = &Pair{transps: []int{}, nextCities: make(map[int]*Pair)}
+	var mainCity = &Pair{transpsDays: []TranspDay{}, nextCities: make(map[int]*Pair)}
 
 	relsPaths := ks.res
 	var res [][]int
 
 	for _, relsPath := range relsPaths {
 
+		dayAnt := 0
 		transpAnt := 0
 		found := true
 		i := len(relsPath) - 2
@@ -187,11 +200,11 @@ func (ks KstarSpec) getFinalPath() [][]int {
 
 			if _, exists := city.nextCities[dep]; !exists {
 				found = false
-				city.nextCities[dep] = &Pair{nextCities: make(map[int]*Pair), transps: []int{transpAnt}}
+				city.nextCities[dep] = &Pair{nextCities: make(map[int]*Pair), transpsDays: []TranspDay{TranspDay{transpAnt, dayAnt}}}
 				city = city.nextCities[dep]
-			} else if !intInSlice(transpAnt, city.nextCities[dep].transps) {
+			} else if !inSlice(transpAnt, dayAnt, city.nextCities[dep].transpsDays) {
 				found = false
-				city.nextCities[dep].transps = append(city.nextCities[dep].transps, transpAnt)
+				city.nextCities[dep].transpsDays = append(city.nextCities[dep].transpsDays, TranspDay{transpAnt, dayAnt})
 				city = city.nextCities[dep]
 			} else {
 				city = city.nextCities[dep]
@@ -200,16 +213,18 @@ func (ks KstarSpec) getFinalPath() [][]int {
 			if i == 1 {
 				arr := ks.H.Graph.Rels[rel].ArrNode
 				transp := ks.H.Graph.Rels[rel].Transp
+				day := ks.H.Graph.Rels[rel].DepTime.Day()
 				if _, exists := city.nextCities[arr]; !exists {
 					found = false
-					city.nextCities[arr] = &Pair{nextCities: make(map[int]*Pair), transps: []int{transp}}
-				} else if !intInSlice(transp, city.nextCities[arr].transps) {
+					city.nextCities[arr] = &Pair{nextCities: make(map[int]*Pair), transpsDays: []TranspDay{TranspDay{transp, day}}}
+				} else if !inSlice(transp, day, city.nextCities[arr].transpsDays) {
 					found = false
-					city.nextCities[arr].transps = append(city.nextCities[arr].transps, transp)
+					city.nextCities[arr].transpsDays = append(city.nextCities[arr].transpsDays, TranspDay{transp, day})
 				}
 			}
 
 			transpAnt = ks.H.Graph.Rels[rel].Transp
+			dayAnt = ks.H.Graph.Rels[rel].DepTime.Day()
 			i--
 
 		}
@@ -229,7 +244,9 @@ func (ks KstarSpec) schedulingMechanismEnabled() bool {
 
 func (ks *KstarSpec) resumeAstar(arr int) {
 
-	ks.H.Astar.goAStar(arr, false)
+	t1 := time.Now()
+	ks.H.Astar.GoAStar(arr, false)
+	ks.H.Astar.seconds += time.Now().Sub(t1).Seconds()
 
 	// delete and rebuild the hts
 	for i := range ks.H.Graph.Hts {
@@ -266,13 +283,7 @@ func (ks *KstarSpec) resumeAstar(arr int) {
 
 					doDijkstraStep := true
 
-					d := node.dist
-					if !isCross(&node, &s) {
-						// heap edge
-						d += s.dValue - node.dValue
-					} else {
-						d += s.dValue
-					}
+					d := node.dist + getDelta(&node, &s)
 					if ks.schedulingMechanismEnabled() {
 
 						uNode := ks.H.Astar.Top().(AstarNode)
@@ -338,6 +349,11 @@ func (ks *KstarSpec) dijkstraStep() {
 
 	for _, n2 := range succ {
 
+		n2.usedInDijkstra = true
+		if n2.v != R {
+			ks.H.Graph.Hins[n2.hin][n2.hinIndex] = n2
+		}
+
 		h2 := n2.getHtOrHin()
 		n2.dist = next.dist + getDelta(&next, &n2)
 
@@ -363,10 +379,36 @@ func (ks *KstarSpec) dijkstraStep() {
 	}
 
 	path := ks.getPath(ks.getTetaSeq(&next))
+	ks.updateHeuristic(path, ks.H.Db)
+	ks.res = append(ks.res, path)
+}
 
-	if len(path) > 3 { // avoid direct trips
-		ks.res = append(ks.res, path)
+func (ks KstarSpec) updateHeuristic(path []int, db *neoism.Database) {
+	// get path price
+	totalPrice := 0.0
+	for i := 1; i < len(path)-1; i++ {
+		rel, _ := db.Relationship(path[i])
+		rel.Db = db
+		props, _ := rel.Properties()
+		totalPrice += props["price"].(float64)
 	}
+	var heuristics map[int]map[int]float64
+
+	mutexSpecHeuristic.Lock()
+	dataFile, _ := os.Open("heuristicSpec.gob")
+	dataDecoder := gob.NewDecoder(dataFile)
+	_ = dataDecoder.Decode(&heuristics)
+	dataFile.Close()
+	if heuristics[ks.depId][ks.arrId] > totalPrice || heuristics[ks.depId][ks.arrId] == 0.0 {
+		heuristics[ks.depId][ks.arrId] = totalPrice
+		dataFile, err := os.Create("heuristicSpec.gob")
+		common.PanicErr(err)
+		dataEncoder := gob.NewEncoder(dataFile)
+		dataEncoder.Encode(heuristics)
+	}
+	dataFile.Close()
+	mutexSpecHeuristic.Unlock()
+
 }
 
 func (ks KstarSpec) getPath(tetaSeq [][2]int) []int {
@@ -415,6 +457,9 @@ func (ks KstarSpec) getTetaSeq(node *Node) [][2]int {
 
 func (h *SameDayCombinationsHandler) initVars(dep, arr int) {
 
+	(*h).Kstar.depId = dep
+	(*h).Kstar.arrId = arr
+
 	(*h).Graph.Rels = make(map[int]Rel)
 	(*h).Graph.Hins = make(map[int]Hin)
 	(*h).Graph.Hts = make(map[int]Ht)
@@ -430,6 +475,8 @@ func (h *SameDayCombinationsHandler) initVars(dep, arr int) {
 
 	(*h).Astar.closedVertices = make(map[int]bool)
 	(*h).Astar.openVertices = make(map[int]bool)
+	(*h).Astar.admissible, (*h).Astar.consistent = true, true
+	(*h).Astar.seconds = 0
 
 	(*h).Astar.gScore = make(map[int]float64)
 	(*h).Astar.fScore = make(map[int]float64)
@@ -440,10 +487,10 @@ func (h *SameDayCombinationsHandler) initVars(dep, arr int) {
 	(*h).Astar.fScore[START_ID] = (*h).Astar.getHeuristicValue(dep, arr)
 	(*h).Astar.openVertices[START_ID] = true
 
-	dataFile, err := os.Open(common.FILE_AVERAGES)
+	dataFile, err := os.Open(common.FILE_SPEC_HEURISTIC)
 	common.PanicErr(err)
 	dataDecoder := gob.NewDecoder(dataFile)
-	err = dataDecoder.Decode(&(*h).Astar.tripAverages)
+	err = dataDecoder.Decode(&(*h).Astar.heuristic)
 	common.PanicErr(err)
 	dataFile.Close()
 

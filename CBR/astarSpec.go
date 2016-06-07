@@ -29,7 +29,10 @@ type Astar struct {
 	// cost from start to end, passing by node i (g+h)
 	fScore map[int]float64
 
-	tripAverages map[int]map[int]common.AveragePrice
+	heuristic map[int]map[int]float64
+
+	admissible, consistent bool
+	seconds                float64
 }
 
 type AstarSpec struct {
@@ -71,7 +74,7 @@ func (as Astar) Top() interface{} {
 
 // if start = true, we would look for arr vertex.
 // if start = false, we iterate until we double the current found vertices.
-func (as *AstarSpec) goAStar(arr int, start bool) bool {
+func (as *AstarSpec) GoAStar(arr int, start bool) bool {
 
 	i := 0
 	n := len(as.closedVertices) * 2
@@ -82,7 +85,6 @@ func (as *AstarSpec) goAStar(arr int, start bool) bool {
 			if i == n {
 				return true
 			}
-			i++
 		}
 
 		current := heap.Pop(as).(AstarNode)
@@ -106,6 +108,9 @@ func (as *AstarSpec) goAStar(arr int, start bool) bool {
 		}
 
 		as.openVertices[currentId] = false
+		if !as.closedVertices[currentId] {
+			i++
+		}
 		as.closedVertices[currentId] = true
 
 		if start && currentId == END_ID {
@@ -148,7 +153,7 @@ func (as *AstarSpec) goAStar(arr int, start bool) bool {
 
 			_, cycling := current.Prevs[nextRel.DepNode]
 
-			if !lastNode && !firstNode && (cycling || currentTransfers == common.MAX_TRANSFERS || nextRel.DepTime.Sub(currentRel.ArrTime).Minutes() < 0 || nextRel.DepTime.Sub(currentRel.ArrTime).Hours() > common.MAX_TRANSFER_HOURS) {
+			if !lastNode && !firstNode && (cycling /*|| currentTransfers == common.MAX_TRANSFERS */ || nextRel.DepTime.Sub(currentRel.ArrTime).Minutes() < common.TRANSFER_TIME || nextRel.DepTime.Sub(currentRel.ArrTime).Hours() > common.MAX_TRANSFER_HOURS) {
 				// not a good transfer
 				continue
 			}
@@ -163,8 +168,42 @@ func (as *AstarSpec) goAStar(arr int, start bool) bool {
 					heap.Init(&hin)
 				}
 				node := Node{u: currentId, v: nextRelId, dValue: as.gScore[currentId] + as.H.Graph.Rels[nextRelId].Weight - as.gScore[nextRelId], hin: nextRelId}
+				pair := len(hin)%2 == 0
 				heap.Push(&hin, node)
-				as.H.Graph.Hins[nextRelId] = hin
+
+				tentativeGScore := as.gScore[currentId] + nextRel.Weight
+				if tentativeGScore < as.gScore[nextRelId] {
+					as.consistent = false
+					// fmt.Println("not consistent")
+				}
+
+				// // check if node addition is interfering with the dijkstra execution
+				add := true
+				if !start {
+					for k := range hin {
+						node := hin[k]
+						if node.u == currentId && node.v == nextRelId {
+							if pair && k < len(hin)-2 {
+								for k1 := k + 1; k1 < len(hin); k1++ {
+									if hin[k1].usedInDijkstra {
+										add = false
+									}
+								}
+							} else if k < len(hin)-1 {
+								for k1 := k + 1; k1 < len(hin); k1++ {
+									if hin[k1].usedInDijkstra {
+										add = false
+									}
+								}
+							}
+						}
+					}
+				}
+				if !start && add {
+					as.H.Graph.Hins[nextRelId] = hin
+				} else if start {
+					as.H.Graph.Hins[nextRelId] = hin
+				}
 
 				if lastNode {
 					break
@@ -193,14 +232,23 @@ func (as *AstarSpec) goAStar(arr int, start bool) bool {
 			nextRel.CameFrom = currentId
 			as.H.Graph.Rels[nextRelId] = nextRel
 
+			newPrevs := make(map[int]bool)
+			for k := range current.Prevs {
+				newPrevs[k] = true
+			}
+			newPrevs[currentRel.DepNode] = true
+
 			if !as.openVertices[nextRelId] {
-				newPrevs := make(map[int]bool)
-				for k := range current.Prevs {
-					newPrevs[k] = true
-				}
-				newPrevs[nextRel.DepNode] = true
 				heap.Push(as, AstarNode{Id: nextRelId, Transfers: currentTransfers + 1, Prevs: newPrevs})
 				as.openVertices[nextRelId] = true
+			} else {
+				// fix the heap
+				for i := range as.pq {
+					if as.pq[i].Id == nextRelId {
+						as.pq[i] = AstarNode{Id: nextRelId, Transfers: currentTransfers + 1, Prevs: newPrevs}
+						heap.Fix(as, i)
+					}
+				}
 			}
 
 			if lastNode {
@@ -219,20 +267,24 @@ func (as Astar) getHeuristicValue(a, b int) float64 {
 	if a == b {
 		return 0.0
 	}
-	x := as.tripAverages[a][b].Price
+	x := as.heuristic[a][b]
 	if x == 0.0 {
-		// theoretically, with 2 combinations (A->Buenos Aires->B), it's highly probable that we could get till b. So the average price of 2 trips is returned.
-		return 3000.0 * 0.75
+		// theoretically, with 2 combinations (A->Buenos Aires->B), it's highly probable that we could get till b. So the average price of 2 trips -50% is returned.
+		return 1000000
 	} else {
-		return x * 0.75
+		return x * 0.5
 	}
-	// return 0.0
+	return 0.0
 }
 
 func (as AstarSpec) getRels(depId int) []neoism.Relationship {
 	props := neoism.Props{}
 	var WHERE = "WHERE id(a)={id} AND "
 	props["id"] = depId
+	if depId == as.H.Kstar.depId {
+		WHERE += "id(b)<>{idArr} AND "
+		props["idArr"] = as.H.Kstar.arrId
+	}
 	if as.H.Kstar.difMonth {
 		WHERE += "( "
 	}
@@ -283,7 +335,7 @@ func (as AstarSpec) getRels(depId int) []neoism.Relationship {
 		Statement: `
 			MATCH (a:City)-[r:SPEC]->(b:City) 
 			` + WHERE +
-			` RETURN r
+			` RETURN r LIMIT 100
 		`,
 		Parameters: props,
 		Result:     &rels,
@@ -295,7 +347,6 @@ func (as AstarSpec) getRels(depId int) []neoism.Relationship {
 	for _, rel := range rels {
 		ans = append(ans, rel.Rel)
 	}
-
 	return ans
 
 }
