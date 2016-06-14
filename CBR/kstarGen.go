@@ -50,6 +50,9 @@ func (ks KstarGen) GoKStar(dep, arr int) [][][2]int {
 	// while A* can still work
 	for !ks.H.Astar.Empty() || !ks.Empty() {
 
+		// fmt.Println("astar")
+		// fmt.Println(ks.H.Astar.pq)
+
 		if ks.schedulingMechanismEnabled() {
 
 			if !ks.Empty() {
@@ -313,13 +316,13 @@ func (ks KstarGen) updateHeuristic(path [][2]int, db *neoism.Database) {
 	var heuristics map[int]map[int]float64
 
 	mutexGenHeuristic.Lock()
-	dataFile, _ := os.Open("heuristicGen.gob")
+	dataFile, _ := os.Open(common.FILE_GEN_HEURISTIC)
 	dataDecoder := gob.NewDecoder(dataFile)
 	_ = dataDecoder.Decode(&heuristics)
 	dataFile.Close()
 	if heuristics[dep][arr] > totalPrice || heuristics[dep][arr] == 0.0 {
 		heuristics[dep][arr] = totalPrice
-		dataFile, err := os.Create("heuristicGen.gob")
+		dataFile, err := os.Create(common.FILE_GEN_HEURISTIC)
 		common.PanicErr(err)
 		dataEncoder := gob.NewEncoder(dataFile)
 		dataEncoder.Encode(heuristics)

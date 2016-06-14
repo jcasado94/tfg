@@ -265,7 +265,7 @@ func (ks *KstarSpec) resumeAstar(arr int) {
 					var found bool
 					node, found = ks.H.Graph.Hts[h].getNode(u, v)
 					if !found {
-						node, _ = ks.H.Graph.Hins[h].getNode(u, v)
+						node, found = ks.H.Graph.Hins[h].getNode(u, v)
 					}
 				}
 
@@ -395,13 +395,13 @@ func (ks KstarSpec) updateHeuristic(path []int, db *neoism.Database) {
 	var heuristics map[int]map[int]float64
 
 	mutexSpecHeuristic.Lock()
-	dataFile, _ := os.Open("heuristicSpec.gob")
+	dataFile, _ := os.Open(common.FILE_SPEC_HEURISTIC)
 	dataDecoder := gob.NewDecoder(dataFile)
 	_ = dataDecoder.Decode(&heuristics)
 	dataFile.Close()
 	if heuristics[ks.depId][ks.arrId] > totalPrice || heuristics[ks.depId][ks.arrId] == 0.0 {
 		heuristics[ks.depId][ks.arrId] = totalPrice
-		dataFile, err := os.Create("heuristicSpec.gob")
+		dataFile, err := os.Create(common.FILE_SPEC_HEURISTIC)
 		common.PanicErr(err)
 		dataEncoder := gob.NewEncoder(dataFile)
 		dataEncoder.Encode(heuristics)

@@ -102,6 +102,7 @@ func (as *AstarSpec) GoAStar(arr int, start bool) bool {
 				node.v = currentId
 				node.hin = currentId
 				node.dValue = as.gScore[edge] + as.H.Graph.Rels[currentId].Weight - as.gScore[currentId] // g(u) + c(u,v) - g(v)
+				node.ht = NULL_HT
 				heap.Push(&hin, node)
 			}
 			as.H.Graph.Hins[currentId] = hin
@@ -163,11 +164,14 @@ func (as *AstarSpec) GoAStar(arr int, start bool) bool {
 			if as.closedVertices[nextRelId] {
 
 				// still we add the new sidetrack edge
-				hin := as.H.Graph.Hins[nextRelId]
+				var hin Hin
+				for _, node := range as.H.Graph.Hins[nextRelId] {
+					hin = append(hin, node)
+				}
 				if len(hin) == 0 {
 					heap.Init(&hin)
 				}
-				node := Node{u: currentId, v: nextRelId, dValue: as.gScore[currentId] + as.H.Graph.Rels[nextRelId].Weight - as.gScore[nextRelId], hin: nextRelId}
+				node := Node{u: currentId, v: nextRelId, dValue: as.gScore[currentId] + as.H.Graph.Rels[nextRelId].Weight - as.gScore[nextRelId], hin: nextRelId, ht: NULL_HT}
 				pair := len(hin)%2 == 0
 				heap.Push(&hin, node)
 
@@ -270,7 +274,7 @@ func (as Astar) getHeuristicValue(a, b int) float64 {
 	x := as.heuristic[a][b]
 	if x == 0.0 {
 		// theoretically, with 2 combinations (A->Buenos Aires->B), it's highly probable that we could get till b. So the average price of 2 trips -50% is returned.
-		return 1000000
+		return 400
 	} else {
 		return x * 0.5
 	}

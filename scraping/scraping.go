@@ -90,6 +90,19 @@ func getDayOffersAerolineas(year, month, day, adults, children11, children5, bab
 		return []common.Trip{}
 	}
 
+	monthN, _ := strconv.Atoi(month)
+	dayN, _ := strconv.Atoi(day)
+	if monthN < 10 && string(month[0]) != "0" {
+		month = "0" + month
+	}
+	if dayN < 10 && string(day[0]) != "0" {
+		day = "0" + day
+	}
+
+	if childrenN == 0 {
+		return getDayOffersAlmundo(year, month, day, adults, children11, children5, babies, orig, dest)
+	}
+
 	client := initializeClient()
 
 	//connect to first website after query
@@ -288,7 +301,7 @@ func getDayOffersAerolineas(year, month, day, adults, children11, children5, bab
 
 /*
 	pre: year, month, day represent a future date.
-		orig and dest are valid places for Aerolineas website.
+		orig and dest are valid places for LAN website.
 		adults > 0, babies <= adults
 	post: the trips of that day are returned
 
@@ -311,10 +324,10 @@ func getDayOffersLAN(year, month, day, adults, children11, children5, babies, or
 
 	myUrl := "http://booking.lan.com/ws/booking/quoting/fares_availability/5.0/rest/get_availability"
 
-	if monthN < 10 {
+	if monthN < 10 && string(month[0]) != "0" {
 		month = "0" + month
 	}
-	if dayN < 10 {
+	if dayN < 10 && string(day[0]) != "0" {
 		day = "0" + day
 	}
 	var jsonStr = []byte(`{"language":"ES","country":"AR","portal":"personas","application":"compra_normal","section":"step2","cabin":"Y","adults":` + adults + `,"children":` + strconv.Itoa(childrenN) + `,"infants":` + babies + `,"roundTrip":false,"departureDate":"` + year + "-" + month + "-" + day + `","origin":"` + orig + `","destination":"` + dest + `"}`)
@@ -425,6 +438,112 @@ func getDayOffersLAN(year, month, day, adults, children11, children5, babies, or
 	}
 
 	return result
+
+}
+
+func getDayOffersAlmundo(year, month, day, adults, children11, children5, babies, orig, dest string) []common.Trip {
+	// intYear, _ := strconv.Atoi(year)
+	intMonth, _ := strconv.Atoi(month)
+	intDay, _ := strconv.Atoi(day)
+	intYear, _ := strconv.Atoi(year)
+	intChildren11, _ := strconv.Atoi(children11)
+	intChildren5, _ := strconv.Atoi(children5)
+	intAdults, _ := strconv.Atoi(adults)
+	floatAdults := float64(intAdults)
+	children := strconv.Itoa(intChildren11 + intChildren5)
+
+	//URL & URL PARAMS
+
+	myUrl1 := "https://vuelos.aerolineas.com.ar/SSW2010/ARAR/webqtrip.html"
+	form1 := url.Values{}
+	form1.Set("name", "ADVSForm")
+	form1.Set("id", "ADVSForm")
+	form1.Add("pointOfSale", "AR")
+	form1.Add("searchType", "CALENDAR")
+	form1.Add("currency", "ARS")
+	form1.Add("alternativeLandingPage", "true")
+	form1.Add("journeySpan", "OW")
+	form1.Add("origin", orig)
+	form1.Add("destination", dest)
+	form1.Add("departureDate", year+"-"+month+"-"+day)
+	form1.Add("numAdults", adults)
+	form1.Add("numChildren", children)
+	form1.Add("numInfants", babies)
+	form1.Add("cabin", "ALL")
+	form1.Add("lang", "es_ES")
+
+	url := "https://almundo.com.ar/flights/async/itineraries?adults=" + adults + "&children=" + children + "&date=" + year + "-" + month + "-" + day + "&from=" + orig + "&infants=" + babies + "&stops=0&to=" + dest
+
+	req, _ := http.NewRequest("GET", url, nil)
+	client := initializeClient()
+	resp, err := client.Do(req)
+	if err != nil {
+		return []common.Trip{}
+	}
+
+	defer resp.Body.Close()
+	body, _ := ioutil.ReadAll(resp.Body)
+
+	var JSON map[string]interface{}
+	json.Unmarshal(body, &JSON)
+
+	if JSON["results"] == nil {
+		return []common.Trip{}
+	}
+	clusters := JSON["results"].(map[string]interface{})["clusters"].([]interface{})
+	var trips []common.Trip
+
+	for _, c := range clusters {
+
+		var newTrip common.Trip
+		newTrip.DepYear, newTrip.DepMonth, newTrip.DepDay = intYear, intMonth, intDay
+		newTrip.Url, newTrip.UrlParams = myUrl1, form1
+
+		cluster := c.(map[string]interface{})
+		trip := cluster["segments"].([]interface{})[0].(map[string]interface{})["choices"].([]interface{})[0].(map[string]interface{})
+		price := cluster["price"].(map[string]interface{})
+
+		depTime := trip["departure_time"].(string)
+		times := strings.Split(depTime, ":")
+		newTrip.DepHour, _ = strconv.Atoi(times[0])
+		newTrip.DepMin, _ = strconv.Atoi(times[1])
+
+		arrDate := trip["arrival_date"].(map[string]interface{})
+		date := strings.Split(arrDate["plain"].(string), "-")
+		newTrip.ArrYear, _ = strconv.Atoi(date[0])
+		newTrip.ArrMonth, _ = strconv.Atoi(date[1])
+		newTrip.ArrDay, _ = strconv.Atoi(date[2])
+		arrTime := trip["arrival_time"].(string)
+		times = strings.Split(arrTime, ":")
+		newTrip.ArrHour, _ = strconv.Atoi(times[0])
+		newTrip.ArrMin, _ = strconv.Atoi(times[1])
+
+		leg := trip["legs"].([]interface{})[0].(map[string]interface{})
+		carrier := leg["marketing_carrier"].(map[string]interface{})["code"].(string)
+		if carrier != "AR" {
+			continue
+		}
+		number := int(leg["number"].(float64))
+		flight := carrier + strconv.Itoa(number)
+		newTrip.FlightNumber = flight
+
+		newTrip.DepAirp = leg["origin"].(map[string]interface{})["code"].(string)
+		newTrip.ArrAirp = leg["destination"].(map[string]interface{})["code"].(string)
+
+		total := price["total"].(float64)
+		detail := price["detail"].(map[string]interface{})
+		adults := detail["adults"].(float64)
+		taxes := detail["taxes"].(float64)
+		tax := taxes / floatAdults
+		newTrip.PricePerAdult = adults + tax
+		fee := detail["fee"].(float64)
+		newTrip.TotalPrice = total - fee
+
+		trips = append(trips, newTrip)
+
+	}
+
+	return trips
 
 }
 
@@ -739,373 +858,3 @@ func retainGeneralTrips(trips []common.Trip, dep, arr string, transp int) {
 	common.PanicErr(err)
 
 }
-
-/*****
-OLD
-*/
-
-/*
-	gets all the available flights with its cheapest available price.
-*/
-// func getFlightsAerolineasChildren(i int, client *http.Client, c chan common.Trip, year, month, day, adults, children, babies, orig, dest string) {
-
-// 	//connect to first website after query
-// 	myUrl1 := "https://vuelos.aerolineas.com.ar/SSW2010/ARAR/webqtrip.html"
-// 	form1 := url.Values{}
-// 	form1.Set("name", "ADVSForm")
-// 	form1.Set("id", "ADVSForm")
-// 	form1.Add("pointOfSale", "AR")
-// 	form1.Add("searchType", "CALENDAR")
-// 	form1.Add("currency", "ARS")
-// 	form1.Add("alternativeLandingPage", "true")
-// 	form1.Add("journeySpan", "OW")
-// 	form1.Add("origin", orig)
-// 	form1.Add("destination", dest)
-// 	form1.Add("departureDate", year+"-"+month+"-"+day)
-// 	form1.Add("numAdults", adults)
-// 	form1.Add("numChildren", children)
-// 	form1.Add("numInfants", babies)
-// 	form1.Add("cabin", "ALL")
-// 	form1.Add("lang", "es_ES")
-
-// 	r, _ := http.NewRequest("POST", myUrl1, bytes.NewBufferString(form1.Encode()))
-// 	r.Header.Add("Authorization", "auth_token=\"XXXXXXX\"")
-// 	r.Header.Add("Content-Type", "application/x-www-form-urlencoded")
-// 	resp, _ := client.Do(r)
-
-// 	//connect to second website
-// 	myUrl2 := "https://vuelos.aerolineas.com.ar/SSW2010/ARAR/webqtrip.html?execution=e1s1"
-// 	form2 := url.Values{}
-// 	form2.Set("_eventId_next", "")
-// 	r, _ = http.NewRequest("POST", myUrl2, bytes.NewBufferString(form2.Encode()))
-// 	r.Header.Add("Authorization", "auth_token=\"XXXXXXX\"")
-// 	r.Header.Add("Content-Type", "application/x-www-form-urlencoded")
-// 	resp, _ = client.Do(r)
-
-// 	defer resp.Body.Close()
-// 	z := html.NewTokenizer(resp.Body)
-
-// 	it := 0
-
-// 	for {
-// 		//take all the ids
-// 		tt := z.Next()
-
-// 		switch {
-
-// 		case tt == html.TextToken:
-
-// 			direct := string(z.Raw()) == orig
-
-// 			if direct {
-// 				z.Next()
-// 				z.Next()
-// 				z.Next()
-// 				z.Next()
-// 				z.Next()
-// 				z.Next()
-// 				direct = string(z.Raw()) == dest
-// 			}
-
-// 			if direct {
-
-// 				//look for flight id, should be in next "input" tag
-
-// 				if i == it {
-
-// 					tripFound := false
-
-// 					for !tripFound {
-
-// 						tt = z.Next()
-
-// 						switch {
-
-// 						case tt == html.SelfClosingTagToken:
-
-// 							t := z.Token()
-
-// 							if t.Data == "input" {
-// 								tripFound = true
-// 								id := strings.Split(t.Attr[0].Val, "_")[2]
-// 								c <- getFlightAerolinias(id, myUrl1, &form1, client)
-// 								return
-// 							}
-
-// 						}
-// 					}
-// 				}
-
-// 				it++
-
-// 			} else {
-// 				c <- common.Trip{TotalPrice: -1.0}
-// 				return
-// 			}
-
-// 		case tt == html.ErrorToken:
-// 			c <- common.Trip{TotalPrice: -1.0}
-// 			return
-// 		}
-
-// 	}
-
-// }
-
-// func getFlightAerolinias(id string, postUrl string, urlParams *url.Values, client *http.Client) common.Trip {
-
-// 	var newTrip common.Trip
-// 	newTrip.Url = postUrl
-// 	newTrip.UrlParams = *urlParams
-
-// 	//get json with info about flight
-// 	myUrl := "https://vuelos.aerolineas.com.ar/SSW2010/ARAR/webqtrip.html"
-// 	form := url.Values{}
-// 	form.Set("_eventId_ajax", "")
-// 	form.Set("ajaxSource", "true")
-// 	form.Set("contextObject", `{"transferObjects":[{"componentType":"cart","actionCode":"checkPrice","queryData":{"componentId":"cart_1","componentType":"cart","actionCode":"checkPrice","queryData":null,"requestPartials":["initialized"],"selectedBasketRefs":[`+id+`]}}]}`)
-// 	form.Set("execution", "e1s2")
-
-// 	r, _ := http.NewRequest("POST", myUrl, bytes.NewBufferString(form.Encode()))
-// 	r.Header.Add("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8")
-
-// 	resp, _ := client.Do(r)
-
-// 	body, _ := ioutil.ReadAll(resp.Body)
-// 	// ioutil.WriteFile("megajson.html", body, 0644)
-// 	resp.Body.Close()
-// 	var JSON map[string]interface{}
-// 	json.Unmarshal(body, &JSON)
-
-// 	model := JSON["content"].([]interface{})[0].(map[string]interface{})["model"].(map[string]interface{})
-
-// 	//total price
-// 	totalPrice := model["amountDuePrices"].(map[string]interface{})["priceAlternatives"].([]interface{})[0].(map[string]interface{})["pricesPerCurrency"].(map[string]interface{})["ARS"].(map[string]interface{})["amount"].(string)
-// 	newTrip.TotalPrice, _ = strconv.ParseFloat(totalPrice, 64)
-
-// 	//other info
-// 	itineraryParts := model["itineraryParts"].([]interface{})[0].(map[string]interface{})
-// 	segments := itineraryParts["segments"].([]interface{})[0].(map[string]interface{})
-// 	flightNumber := strconv.FormatFloat(segments["flightNumber"].([]interface{})[0].(float64), 'f', 0, 64)
-// 	newTrip.FlightNumber = "AR" + flightNumber
-// 	newTrip.DepAirp = segments["departureCode"].(string)
-// 	newTrip.ArrAirp = segments["arrivalCode"].(string)
-// 	date := strings.Split(segments["departureDate"].(string), " ")
-// 	yearmonthday := strings.Split(date[0], "/")
-// 	newTrip.DepYear, _ = strconv.Atoi(yearmonthday[0])
-// 	newTrip.DepMonth, _ = strconv.Atoi(yearmonthday[1])
-// 	newTrip.DepDay, _ = strconv.Atoi(yearmonthday[2])
-// 	hour := strings.Split(date[1], ":")
-// 	newTrip.DepHour, _ = strconv.Atoi(hour[0])
-// 	newTrip.DepMin, _ = strconv.Atoi(hour[1])
-// 	date = strings.Split(segments["arrivalDate"].(string), " ")
-// 	yearmonthday = strings.Split(date[0], "/")
-// 	newTrip.ArrYear, _ = strconv.Atoi(yearmonthday[0])
-// 	newTrip.ArrMonth, _ = strconv.Atoi(yearmonthday[1])
-// 	newTrip.ArrDay, _ = strconv.Atoi(yearmonthday[2])
-// 	hour = strings.Split(date[1], ":")
-// 	newTrip.ArrHour, _ = strconv.Atoi(hour[0])
-// 	newTrip.ArrMin, _ = strconv.Atoi(hour[1])
-
-// 	//adult price
-// 	newTrip.PricePerAdult, _ = strconv.ParseFloat(itineraryParts["prices"].(map[string]interface{})["priceAlternatives"].([]interface{})[0].(map[string]interface{})["pricesPerCurrency"].(map[string]interface{})["ARS"].(map[string]interface{})["amount"].(string), 64)
-
-// 	return newTrip
-// }
-
-// /*
-//  	pre: Children = 0.
-// 	gets all the available flights with its cheapest available price.
-// */
-// func getFlightsAerolineasAdults(year, month, day, adults, children, babies, orig, dest string) []common.Trip {
-
-// 	client := initializeClient()
-// 	adultsN, _ := strconv.Atoi(adults)
-// 	nextDay := 0
-
-// 	//connect to first website after query
-// 	myUrl1 := "https://vuelos.aerolineas.com.ar/SSW2010/ARAR/webqtrip.html"
-// 	form1 := url.Values{}
-// 	form1.Set("name", "ADVSForm")
-// 	form1.Set("id", "ADVSForm")
-// 	form1.Add("pointOfSale", "AR")
-// 	form1.Add("searchType", "CALENDAR")
-// 	form1.Add("currency", "ARS")
-// 	form1.Add("alternativeLandingPage", "true")
-// 	form1.Add("journeySpan", "OW")
-// 	form1.Add("origin", orig)
-// 	form1.Add("destination", dest)
-// 	form1.Add("departureDate", year+"-"+month+"-"+day)
-// 	form1.Add("numAdults", adults)
-// 	form1.Add("numChildren", children)
-// 	form1.Add("numInfants", babies)
-// 	form1.Add("cabin", "ALL")
-// 	form1.Add("lang", "es_ES")
-
-// 	r, _ := http.NewRequest("POST", myUrl1, bytes.NewBufferString(form1.Encode()))
-// 	r.Header.Add("Authorization", "auth_token=\"XXXXXXX\"")
-// 	r.Header.Add("Content-Type", "application/x-www-form-urlencoded")
-// 	resp, _ := client.Do(r)
-
-// 	//connect to second website
-// 	myUrl2 := "https://vuelos.aerolineas.com.ar/SSW2010/ARAR/webqtrip.html?execution=e1s1"
-// 	form2 := url.Values{}
-// 	form2.Set("_eventId_next", "")
-// 	r, _ = http.NewRequest("POST", myUrl2, bytes.NewBufferString(form2.Encode()))
-// 	r.Header.Add("Authorization", "auth_token=\"XXXXXXX\"")
-// 	r.Header.Add("Content-Type", "application/x-www-form-urlencoded")
-// 	resp, _ = client.Do(r)
-
-// 	defer resp.Body.Close()
-
-// 	z := html.NewTokenizer(resp.Body)
-// 	result := []common.Trip{}
-// 	end := false
-
-// 	for end == false {
-// 		tt := z.Next()
-// 		switch {
-
-// 		case tt == html.StartTagToken:
-
-// 			t := z.Token()
-// 			if t.Data == "span" && len(t.Attr) > 0 && t.Attr[0].Val == "airport_code" {
-// 				var trip common.Trip
-
-// 				//departure airport
-// 				z.Next() //should be airport code
-// 				trip.DepAirp = string(z.Raw())
-
-// 				//departure time
-// 				z.Next()
-// 				z.Next()
-// 				z.Next() //should be dep time
-// 				divided := strings.Split(string(z.Raw()), ":")
-// 				trip.DepHour, _ = strconv.Atoi(divided[0])
-// 				trip.DepMin, _ = strconv.Atoi(divided[1])
-// 				trip.DepYear, _ = strconv.Atoi(year)
-// 				trip.DepMonth, _ = strconv.Atoi(month)
-// 				trip.DepDay, _ = strconv.Atoi(day)
-
-// 				found := false
-// 				for found == false {
-// 					tt = z.Next() // move till the arrival time
-// 					switch {
-// 					case tt == html.StartTagToken:
-// 						t = z.Token()
-// 						if t.Data == "span" && len(t.Attr) > 0 && t.Attr[0].Val == "airport_code" {
-
-// 							//arrival airport
-// 							z.Next()
-// 							trip.ArrAirp = string(z.Raw())
-
-// 							//arrival time
-// 							z.Next()
-// 							z.Next()
-// 							z.Next()
-// 							divided = strings.Split(string(z.Raw()), ":")
-// 							trip.ArrHour, _ = strconv.Atoi(divided[0])
-// 							trip.ArrMin, _ = strconv.Atoi(divided[1])
-// 							if trip.ArrHour < trip.DepHour { // arrives the next day
-// 								nextDay++
-// 							}
-// 							trip.ArrYear = trip.DepYear
-// 							trip.ArrMonth = trip.DepMonth
-// 							trip.ArrDay = trip.DepDay + nextDay // if year or month changes, golang will correct it in the Date creation, when needed
-
-// 							found = true
-// 						}
-// 					default:
-// 						continue
-// 					}
-// 				}
-// 				// check the flight's number
-// 				found = false
-// 				for found == false {
-// 					tt = z.Next()
-// 					switch {
-// 					case tt == html.StartTagToken:
-// 						t = z.Token()
-// 						if t.Data == "a" { //it's the next link in the html
-// 							z.Next() //should be the number
-// 							trip.FlightNumber = strings.Replace(strings.TrimSpace(string(z.Raw())), " ", "", 1)
-// 							found = true
-// 						}
-// 					default:
-// 						continue
-// 					}
-// 				}
-
-// 				// check if it's a direct flight
-// 				found = false
-// 				for found == false {
-// 					tt = z.Next()
-// 					switch {
-// 					case tt == html.StartTagToken:
-// 						t = z.Token()
-// 						if t.Data == "span" && len(t.Attr) > 0 && t.Attr[0].Val == "translate stops wasTranslated" {
-
-// 							z.Next()
-
-// 							direct := string(z.Raw()) == orig
-
-// 							if direct {
-// 								z.Next()
-// 								z.Next()
-// 								z.Next()
-// 								z.Next()
-// 								z.Next()
-// 								z.Next()
-// 								direct = string(z.Raw()) == dest
-// 							}
-
-// 							if direct {
-// 								//look for flight's cheapest price
-// 								found2 := false
-// 								for found2 == false {
-// 									tt = z.Next()
-// 									switch {
-// 									case tt == html.StartTagToken:
-// 										t = z.Token()
-// 										if t.Data == "span" && len(t.Attr) > 0 && t.Attr[0].Val == "prices-amount" {
-// 											z.Next() //should be the price
-// 											float, _ := strconv.ParseFloat(string(z.Raw()), 64)
-// 											trip.PricePerAdult = float
-// 											trip.TotalPrice = float * float64(adultsN)
-// 											trip.Url = myUrl1
-// 											trip.UrlParams = form1
-// 											result = append(result, trip)
-// 											found = true
-// 											found2 = true
-
-// 											//check the total price
-// 											tt = z.Next()
-
-// 										}
-
-// 									default:
-// 										continue
-// 									}
-// 								}
-// 							} else {
-// 								end = true
-// 								found = true
-// 							}
-// 						}
-
-// 					default:
-// 						continue
-// 					}
-// 				}
-// 			}
-
-// 		case tt == html.ErrorToken:
-// 			end = true
-
-// 		default:
-// 			continue
-
-// 		}
-// 	}
-// 	return result
-// }

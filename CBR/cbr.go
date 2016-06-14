@@ -366,9 +366,9 @@ func (h *SameDayCombinationsHandler) RetrieveSpecificSolutions(year, month, day,
 	h.Db = db
 	h.Kstar.H = h
 
-	// t1 := time.Now()
+	t1 := time.Now()
 	paths := h.Kstar.GoKStar(intDepId, intArrId)
-	// fmt.Println(time.Now().Sub(t1))
+	fmt.Println(time.Now().Sub(t1))
 
 	// var a []float64
 	// dataFile, _ := os.Open("specTimes.gob")

@@ -8,6 +8,7 @@ import (
 	"time"
 )
 
+const NULL_HT = -4
 const START_ID = -1
 const END_ID = -2
 const R = -3
@@ -106,11 +107,11 @@ func isCross(n *Node, m *Node) bool {
 }
 
 func (n Node) isTop() bool {
-	return n.ht != 0 && n.htIndex == 0
+	return n.ht != NULL_HT && n.htIndex == 0
 }
 
 func (n Node) isHin() bool {
-	return n.ht == 0
+	return n.ht == NULL_HT
 }
 
 func (g *GraphSpec) createHt(i int) {

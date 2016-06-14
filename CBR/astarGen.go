@@ -54,6 +54,7 @@ func (as *AstarGen) GoAStar(arr int, start bool) bool {
 				node.hin = currentId
 				node.dValue = as.gScore[edge.idNode] + edge.weight - as.gScore[currentId] // g(u) + c(u,v) - g(v)
 				node.transp = edge.transp
+				node.ht = NULL_HT
 				heap.Push(&hin, node)
 			}
 			as.H.Graph.Hins[currentId] = hin
@@ -103,11 +104,14 @@ func (as *AstarGen) GoAStar(arr int, start bool) bool {
 			if as.closedVertices[nextCityId] {
 
 				// still we add the new sidetrack edge
-				hin := as.H.Graph.Hins[nextCityId]
+				var hin Hin
+				for _, node := range as.H.Graph.Hins[nextCityId] {
+					hin = append(hin, node)
+				}
 				if len(hin) == 0 {
 					heap.Init(&hin)
 				}
-				node := Node{u: currentId, v: nextCityId, dValue: as.gScore[currentId] + weight - as.gScore[nextCityId], hin: nextCityId, transp: transp}
+				node := Node{u: currentId, v: nextCityId, dValue: as.gScore[currentId] + weight - as.gScore[nextCityId], hin: nextCityId, transp: transp, ht: NULL_HT}
 				pair := len(hin)%2 == 0
 				heap.Push(&hin, node)
 

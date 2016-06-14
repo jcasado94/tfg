@@ -31,6 +31,9 @@ const WEB_HTML_PATH = `D:\Users\Documentos\GOlang\src\github.com\jcasado94\tfg\w
 // PATH TO WEB STATIC ELEMENTS
 const WEB_STATIC_PATH = `D:\Users\Documentos\GOlang\src\github.com\jcasado94\tfg\web\static`
 
+const HEURISTIC_SPEC_PATH = `D:\Users\Documentos\GOlang\src\github.com\jcasado94\tfg\static\heuristicSpec.gob`
+const HEURISTIC_GEN_PATH = `D:\Users\Documentos\GOlang\src\github.com\jcasado94\tfg\static\heuristicGen.gob`
+
 // NUMBER OF DAYS AWAY FROM THE DEPARTURE DAY TO LOOK FOR IN GENERAL PATHS
 const GEN_DAYS_SCOPE = 1
 

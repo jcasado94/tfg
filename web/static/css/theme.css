@@ -79,7 +79,7 @@ body {
 }
 
 .container-main-adds {
-  margin-top: 100px;
+  margin-top: 40px;
   margin-right: 10%;
   margin-left: 10%;
 }
@@ -169,10 +169,6 @@ body {
     margin-left: 3px
 }
 
-/*.filter-option input {
-  width:100%;
-}*/
-
 .search-info {
   height: auto;
   padding: 0
@@ -185,6 +181,24 @@ body {
   margin-left:10px;
   margin-right:10px;
   margin-top:10px;
+}
+
+/*.change-search-mobile > div > ul {
+  list-style: none; 
+  padding:0;
+}*/
+
+/*.change-search-mobile > ul > li > div {
+  display: inline;
+}*/
+/*
+.change-search-mobile > ul > li {
+
+  display: inline;
+}*/
+
+.change-search-mobile > div > div > div {
+  display:inline;
 }
 
 .search-date {

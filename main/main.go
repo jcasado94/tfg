@@ -5,9 +5,9 @@ import (
 	"github.com/jcasado94/tfg/CBR"
 	"github.com/jcasado94/tfg/common"
 	"github.com/jcasado94/tfg/db"
+	// "github.com/jcasado94/tfg/scraping"
 	"github.com/jcasado94/tfg/web"
 	"net/http"
-	// "github.com/jcasado94/tfg/scraping"
 )
 
 func main() {
@@ -29,4 +29,5 @@ func main() {
 	// fmt.Println(scraping.GetDayOffers("2016", "05", "11", "5", "5", "0", "0", "10", "521", 2))
 	// t2 := time.Now()
 	// fmt.Println(t2.Sub(t1))
+	// fmt.Println(scraping.GetDayOffersAlmundo("2016", "6", "16", "2", "0", "0", "0", "BUE", "SLA"))
 }

@@ -1,9 +1,6 @@
 // global map airport->city.
 airpCityMap = new Map([["AEP", "Ciudad de Buenos Aires"],["EZE","Ciudad de Buenos Aires"],["BHI","Bahía Blanca"],["BRC","San Carlos de Bariloche"],["CTC","San Fernando del Valle de Catamarca"],["CRD","Comodoro Rivadavia"],["COR","Córdoba"],["CNQ","Corrientes"],["FTE","El Calafate"],["EQS","Esquel"],["FMA","Formosa"],["IGR","Puerto Iguazú"],["JUJ","Jujuy"],["IRJ","La Rioja"],["MDQ","Mar del Plata"],["MDZ","Mendoza"],["NQN","Neuquén"],["PRA","Paraná"],["PSS","Posadas"],["RES","Resistencia"],["RGL","Río Gallegos"],["RGA","Río Grande"],["RHD","Termas de Río Hondo"],["ROS","Rosario"],["SLA","Salta"],["UAQ","San Juan"],["LUQ","San Luís"],["CPC","San Martín de los Andes"],["AFA","San Rafael"],["SFN","Santa Fe"],["RSA","Santa Rosa"],["SDE","Santiago del Estero"],["REL","Trelew"],["TUC","San Miguel de Tucumán"],["USH","Ushuaia"],["VDM","Viedma"]])
 
-// modal id global variable
-modalNumber = 0
-
 // current page number
 pageNumber = 1
 
@@ -18,6 +15,13 @@ transfersFilterChanged = false
 // index for checking if post result is consistent with the current search
 queryInd = 0
 
+// check if first combination json has arrived
+firstCombJsonArrived = false
+firstCombJson = {}
+combJsonInd = 0
+
+allTripsJson = []
+
 
 function swapCities() {
 	var origVal = $('#select-orig-city').selectize()[0].selectize.getValue()
@@ -27,32 +31,50 @@ function swapCities() {
 }
 
 function getTripTotalPrice(trip) {
-	return parseInt(trip.children[1].children[0].children[0].textContent.slice(0, -1).replace(/\./g, ''))
+	//return parseInt(trip.children[1].children[0].children[0].textContent.slice(0, -1).replace(/\./g, ''))
+	var jsonTrips = allTripsJson[trip.id]
+	var total = 0.0
+	for (i = 0; i < jsonTrips.length; i++) {
+		total += jsonTrips[i].TotalPrice
+	}
+	return Math.round(total)
 }
 
 function getTripAdultPrice(trip) {
-	return parseInt(trip.children[1].children[0].children[1].textContent.split("$")[0].substring(1).replace(/\./g, ''))
+	// return parseInt(trip.children[1].children[0].children[1].textContent.split("$")[0].substring(1).replace(/\./g, ''))
+	var jsonTrips = allTripsJson[trip.id]
+	var total = 0.0
+	for (i = 0; i < jsonTrips.length; i++) {
+		total += jsonTrips[i].PricePerAdult
+	}
+	return Math.round(total)
 }
 
 function getTripDepHourMin(trip) {
-	var hourMin = trip.children[0].children[1].children[0].children[0].children[0].textContent.split(":")
-	var hour = parseInt(hourMin[0])
-	var min = parseInt(hourMin[1])
-	return [hour, min]
+	// var hourMin = trip.children[0].children[1].children[0].children[0].children[0].textContent.split(":")
+	// var hour = parseInt(hourMin[0])
+	// var min = parseInt(hourMin[1])
+	// return [hour, min]
+	var jsonTrips = allTripsJson[trip.id]
+	return [jsonTrips[0].DepHour, jsonTrips[0].DepMin]
 }
 
 function getTripArrDayMonth(trip) {
-	dayMonth = trip.children[0].children[1].children[2].children[0].children[2].textContent.split("/")
-	var day = parseInt(dayMonth[0])
-	var month = parseInt(dayMonth[1])
-	return [day, month]
+	// dayMonth = trip.children[0].children[1].children[2].children[0].children[2].textContent.split("/")
+	// var day = parseInt(dayMonth[0])
+	// var month = parseInt(dayMonth[1])
+	// return [day, month]
+	var jsonTrips = allTripsJson[trip.id]
+	return [jsonTrips[jsonTrips.length-1].ArrDay, jsonTrips[jsonTrips.length-1].ArrMonth]
 }
 
 function getTripDepDayMonth(trip) {
-	var dayMonth = trip.children[0].children[1].children[0].children[0].children[2].textContent.split("/")
-	var day = parseInt(dayMonth[0])
-	var month = parseInt(dayMonth[1])
-	return [day, month]
+	// var dayMonth = trip.children[0].children[1].children[0].children[0].children[2].textContent.split("/")
+	// var day = parseInt(dayMonth[0])
+	// var month = parseInt(dayMonth[1])
+	// return [day, month]
+	var jsonTrips = allTripsJson[trip.id]
+	return [jsonTrips[0].DepDay, jsonTrips[0].DepMonth]
 }
 
 function getTravelDays(trip) {
@@ -66,7 +88,9 @@ function getTravelDays(trip) {
 }
 
 function getTripTransfers(trip) {
-	return Math.floor(trip.children[0].children[0].children[0].children[0].children[0].children.length / 2)
+	// return Math.floor(trip.children[0].children[0].children[0].children[0].children[0].children.length / 2)
+	var jsonTrips = allTripsJson[trip.id]
+	return jsonTrips.length-1
 }
 
 function buscar() {
@@ -246,7 +270,7 @@ function updatePagination() {
 	$('#number-of-results').html(tripsNumber + ' resultados')
 
 	//  update page numbers
-	var maxPages = Math.ceil(tripsNumber/10.0)
+	var maxPages = Math.max(Math.ceil(tripsNumber/10.0),1)
 	if (maxPages < pageNumber) {
 		pageNumber = maxPages
 	}
@@ -268,7 +292,7 @@ function updatePagination() {
 	}
 
 	// update page numbers
-	$('.pages').bootpag({total: Math.ceil(validTrips/10.0)});
+	$('.pages').bootpag({total: Math.max(Math.ceil(validTrips/10.0), 1)});
 }
 
 function updatePriceFilter(minPrice, maxPrice) {
@@ -342,7 +366,7 @@ function addPoints(n){
     });
 }
 
-function sort_by_total_price(a, b) {
+function  sort_by_total_price(a, b) {
 	var aPrice = getTripTotalPrice(a)
 	var bPrice = getTripTotalPrice(b)
 	return aPrice - bPrice
@@ -481,11 +505,14 @@ function addCombinationsSorted(json, depName, arrName) {
 		// no results
 		return
 	}
+	
+	var tripId = allTripsJson.length
+	allTripsJson = allTripsJson.concat(json)
 
 	var htmlCurrentTrips = document.getElementById('trips').children
 	var newTrips = ''
 
-	for (i = 0; i < json.length; i++, modalNumber++) {
+	for (i = 0; i < json.length; i++, tripId++) {
 		var trips = json[i]
 
 		totalPrice = 0; pricePerAdult = 0;
@@ -504,7 +531,7 @@ function addCombinationsSorted(json, depName, arrName) {
 
 		var transpTypes = [] // 0 -> plane, 1 -> bus
 
-		modal = '<div class="modal fade" id="myModal'+modalNumber+'" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">\
+		modal = '<div class="modal fade" id="myModal'+tripId+'" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">\
                   <div class="modal-dialog" role="document">\
                     <div class="modal-content">\
                       <div class="modal-header">\
@@ -550,11 +577,11 @@ function addCombinationsSorted(json, depName, arrName) {
 				arrCity = stationAndCity[1].split("-")[0].trim()
 			}
 
-			if (trip.FlightNumber.substring(0,2)=='LA'){
+			if (trip.FlightNumber.substring(0,2)=='LA'){ //lan
 				flightNumberAirline = trip.FlightNumber + ' <small>(LATAM)</small>'
-			} else if (trip.FlightNumber.substring(0,2)=='AR') {
+			} else if (trip.FlightNumber.substring(0,2)=='AR') { //aerolineas
 				flightNumberAirline = trip.FlightNumber + ' <small>(Aerolíneas Arg.)</small>'
-			} else {
+			} else { // bus
 				var splited = trip.FlightNumber.split("-")
 				flightNumberAirline = splited.slice(0,splited.length-1).join('')  + '<small>(' + splited[splited.length-1].trim() + ')</small>'
 			}
@@ -613,7 +640,7 @@ function addCombinationsSorted(json, depName, arrName) {
         </div>\
     </div>'
 
-		well = '<div class="span12 well trip">\
+		well = '<div class="span12 well trip" id="'+tripId+'">\
 	                <div class="trip-dep-arr-container container">\
 	                    <div class="row">\
 	                        <div class="col-md-6 col-dep-arr col-md-offset-3">\
@@ -649,7 +676,7 @@ function addCombinationsSorted(json, depName, arrName) {
 	                    <div class="trip-price text-center">\
 	                        <div class="price">'+addPoints(totalPrice)+'$</br></div>\
 	                        <div class="price-per-adult">('+addPoints(pricePerAdult)+'$ p/adulto)</div>\
-	                        </div><div class="btn-price-container"><button type="button" class="btn btn-success" data-toggle="modal" data-target="#myModal'+modalNumber+'">Ver</button>'
+	                        </div><div class="btn-price-container"><button type="button" class="btn btn-success" data-toggle="modal" data-target="#myModal'+tripId+'">Ver</button>'
 
          newTrips = newTrips + well + modal
 	}
@@ -723,17 +750,17 @@ function addCombinationsSorted(json, depName, arrName) {
 
 }
 
-function removeDuplicates(jsonTotal) {
+function removeDuplicates(oldJson, newJson) {
 
-	for(var i=0; i<jsonTotal.length; ++i) {
-        for(var j=i+1; j<jsonTotal.length; ++j) {
-            if(compareJSONs(jsonTotal[i],jsonTotal[j])) {
-                jsonTotal.splice(j--, 1)
-            }
-        }
+	var finalJson = []
+	for(var i=0; i<newJson.length; i++) {
+		var found = false
+        for(var j=0; j<oldJson.length; j++) 
+            if(compareJSONs(newJson[i], oldJson[j])) found = true
+        if (!found) finalJson.push(newJson[i])
     }
 
-    return jsonTotal;
+    return finalJson
 
 }
 
@@ -747,10 +774,9 @@ function compareJSONs(a, b) {
 		var aJson = a[i]; var bJson = b[i]
 
 		for (var key in aJson) {
-			if (key == 'Url' || key == 'UrlParams') continue
-			if (aJson[key] != bJson[key]) {
+			if (key == 'Url' || key == 'UrlParams' || key == 'Id') continue
+			if (aJson[key] != bJson[key])
 				return false
-			}
 		}
 	}
 
@@ -799,6 +825,13 @@ function sendPosts() {
 
 	queryInd++
 
+	// restart json
+	allTripsJson = []
+
+	// comb json
+	firstCombJsonArrived = false
+	firstCombJson = null
+
 	// restart "results"
 	$('#number-of-results').html('0 resultados')
 
@@ -811,11 +844,9 @@ function sendPosts() {
 	$('.sorting-options-progress').css('width', '0%')
 	$('.sorting-options-progress').css('display', 'block')
 
-	// modal id global variable
-	modalNumber = 0
-
 	// current page number
 	pageNumber = 1
+	$('.pages').bootpag({total: pageNumber});
 
 	depYear = 0
 
@@ -827,9 +858,13 @@ function sendPosts() {
 
 	depYear = year
 
-    $('#dep-city').html('<strong>'+depName+'</strong>')
-    $('#arr-city').html('<strong>'+arrName+'</strong>')
-    $('#dep-date-info').html(("0" + day).slice(-2) + '/' + ("0" + month).slice(-2) + '/' + year)
+    $('.dep-city').html('<strong>'+depName+'</strong>')
+    $('.arr-city').html('<strong>'+arrName+'</strong>')
+    var ppl = parseInt(adults)+parseInt(children5)+parseInt(children11)+parseInt(infants)
+    var persona = 'persona'
+    if (ppl > 1) persona = 'personas'
+    $('.number-people').html('<strong>'+ppl+'</strong> x <img src="static/assets/man-silhouette.png">')
+    $('.dep-date-info').html(("0" + day).slice(-2) + '/' + ("0" + month).slice(-2) + '/' + year)
 
     var ind = 0
 
@@ -944,104 +979,146 @@ function sendPosts() {
     var usualTrips = ''
     var specificTrips = ''
 
-    function ajax1() { 
-        return $.ajax( {
-            type: "POST",
-            url: "/usualCombinations",
-            data: JSON.stringify({
-                Year: year,
-                Month: month,
-                Day: day,
-                DepId: dep,
-                ArrId: arr,
-                Adults: adults,
-                Children11: children11,
-                Children5: children5,
-                Infants: infants
-            }),
-            contentType: "application/json",
-            success: function (result1) {
-                // specific day
-                usualTrips = result1
-            },
-            error: function (xhr, ajaxOptions, thrownError) {
-                if (thisQueryInd == queryInd) { // != search changed
-                	ind++
-	                increaseProgressBar(ind)
-	                console.log(xhr.status);
-	                console.log(thrownError);
-	            }
-            }
-        }); 
-    }
-    function ajax2() {
-        return $.ajax( {
-                type: "POST",
-                url: "/sameDayCombinations",
-                data: JSON.stringify({
-                    Year: year,
-                    Month: month,
-                    Day: day,
-                    DepId: dep,
-                    ArrId: arr,
-                    Adults: adults,
-                    Children11: children11,
-                    Children5: children5,
-                    Infants: infants
-                }),
-                contentType: "application/json",
-                success: function (result2) {
-                    specificTrips = result2
-                    // removeRepeated(result1, result2)
-                },
-                error: function (xhr, ajaxOptions, thrownError) {
-                    if (thisQueryInd == queryInd) { // != search changed
-                    	ind++
-	                    increaseProgressBar(ind)
-	                    console.log(xhr.status);
-	                    console.log(thrownError);
-	                }
-                }
-            }); 
-    }
-
-    $.when( ajax1(), ajax2() ).then(
-        function() {
-            // ajax1 AND ajax2 succeeded
-
+    $.ajax( {
+        type: "POST",
+        url: "/usualCombinations",
+        data: JSON.stringify({
+            Year: year,
+            Month: month,
+            Day: day,
+            DepId: dep,
+            ArrId: arr,
+            Adults: adults,
+            Children11: children11,
+            Children5: children5,
+            Infants: infants
+        }),
+        contentType: "application/json",
+        success: function (result1) {
+            // specific day
+            // usualTrips = result1
             if (thisQueryInd != queryInd) { // != search changed
             	return
 			}
-            ind++
-
-            jsonUsual = JSON.parse(usualTrips)
-            jsonSpecific = JSON.parse(specificTrips)
-
-            if (jsonUsual == null && jsonSpecific == null) {
-                increaseProgressBar(ind)
-                return
-            }
-
-            var jsonFinal
-
-            if (jsonUsual == null) {
-                jsonFinal = jsonSpecific
-            } else if (jsonSpecific == null) {
-                jsonFinal = jsonUsual
+            if (!firstCombJsonArrived) {
+ 	           	firstCombJsonArrived = true
+ 	           	if (result1 != null) {
+ 	           		firstCombJson = JSON.parse(result1)
+ 	           		addCombinationsSorted(firstCombJson, depName, arrName)
+ 	           	}
             } else {
-                jsonTotal = jsonUsual.concat(jsonSpecific)
-                jsonFinal = removeDuplicates(jsonTotal)
+            	ind++
+            	if (result1 != null) {
+            		var jsonFinal = []
+	            	if (firstCombJson != null) {
+		            	var newJson = JSON.parse(result1)
+		            	jsonFinal = removeDuplicates(firstCombJson, newJson)
+		            } else {
+		            	jsonFinal = JSON.parse(result1)
+		            }
+	            	addCombinationsSorted(jsonFinal, depName, arrName)
+	            }
+	            increaseProgressBar(ind)
             }
-
-            addCombinationsSorted(jsonFinal, depName, arrName)
-
-            increaseProgressBar(ind)
-
         },
-        function() {
-            // ajax1 OR ajax2 succeeded
+        error: function (xhr, ajaxOptions, thrownError) {
+            if (thisQueryInd == queryInd) { // != search changed
+            	ind++
+                increaseProgressBar(ind)
+                console.log(xhr.status);
+                console.log(thrownError);
+            }
         }
-    );
+    }); 
+    $.ajax( {
+        type: "POST",
+        url: "/sameDayCombinations",
+        data: JSON.stringify({
+            Year: year,
+            Month: month,
+            Day: day,
+            DepId: dep,
+            ArrId: arr,
+            Adults: adults,
+            Children11: children11,
+            Children5: children5,
+            Infants: infants
+        }),
+        contentType: "application/json",
+        success: function (result2) {
+            // specificTrips = result2
+            // removeRepeated(result1, result2)
+            if (thisQueryInd != queryInd) { // != search changed
+            	return
+			}
+            if (!firstCombJsonArrived) {
+ 	           	firstCombJsonArrived = true
+ 	           	if (result2 != null) {
+ 	           		firstCombJson = JSON.parse(result2)
+ 	           		addCombinationsSorted(firstCombJson, depName, arrName)
+ 	           	}
+            } else {
+            	ind++
+            	if (result2 != null) {
+            		var jsonFinal = []
+	            	if (firstCombJson != null) {
+	            		var newJson = JSON.parse(result2)
+		            	jsonFinal = removeDuplicates(firstCombJson, newJson)
+	            	} else {
+	            		jsonFinal = JSON.parse(result2)
+	            	}
+	            	addCombinationsSorted(jsonFinal, depName, arrName)
+	            }
+	            increaseProgressBar(ind)
+            }
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            if (thisQueryInd == queryInd) { // != search changed
+            	ind++
+                increaseProgressBar(ind)
+                console.log(xhr.status);
+                console.log(thrownError);
+            }
+        }
+    }); 
+
+   //  $.when( ajax1(), ajax2() ).then(
+   //      function() {
+   //          // ajax1 AND ajax2 succeeded
+
+   //          if (thisQueryInd != queryInd) { // != search changed
+   //          	return
+			// }
+   //          ind++
+
+   //          jsonUsual = JSON.parse(usualTrips)
+   //          jsonSpecific = JSON.parse(specificTrips)
+
+   //          if (jsonUsual == null && jsonSpecific == null) {
+   //              increaseProgressBar(ind)
+   //              return
+   //          }
+
+   //          var jsonFinal
+
+   //          if (jsonUsual == null) {
+   //              jsonFinal = jsonSpecific
+   //          } else if (jsonSpecific == null) {
+   //              jsonFinal = jsonUsual
+   //          } else {
+   //              jsonTotal = jsonUsual.concat(jsonSpecific)
+   //              jsonFinal = removeDuplicates(jsonTotal)
+   //          }
+
+   //          addCombinationsSorted(jsonFinal, depName, arrName)
+
+   //          increaseProgressBar(ind)
+
+   //      },
+   //      function() {
+   //          // ajax1 OR ajax2 succeeded
+   //      }
+   //  );
 }
 
 function changeSearch() {

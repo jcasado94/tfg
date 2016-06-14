@@ -102,23 +102,25 @@
 
     <div class="container-fluid container-main-adds">
       <div class="row-fluid">
-        <div class="span2 adds-container well">
+        <div class="span2 adds-container well hidden-sm hidden-xs">
             Adds
           <!--Sidebar content-->
         </div>
         <div class="span10 main-container well">
             <div class="container-fluid">
                 <div class="row-fluid">
-                    <div class="span2 main-container-left">
+                    <div class="span2 main-container-left hidden-sm hidden-xs">
                         <div class="well search-info">
                             <ul>
-                                <li id="dep-city"></li>
+                                <li class="dep-city"></li>
                                 <li>a</li>
-                                <li id="arr-city"></li>
+                                <li class="arr-city"></li>
+                                </br>
+                                <li class="number-people"></li>
                             </ul>
                             <div class="search-date">
                                 <button type="button" class="btn btn-xs" onclick="prevDay()" style="float:left"><span class="glyphicon glyphicon-chevron-left"></span>&nbsp;</button>
-                                <span id="dep-date-info"></span>&nbsp;
+                                <span class="dep-date-info"></span>&nbsp;
                                 <button type="button" class="btn btn-xs" onclick="nextDay()" style="float:right"><span class="glyphicon glyphicon-chevron-right"></span>&nbsp;</button>
                             </div>
                             <button type="button" id="change-search" class="btn btn-info" style="width:100%; margin-top:10px" onclick="showChangeSearch()">Cambiar búsqueda</button>
@@ -225,6 +227,12 @@
                         </div>
                     </div>
                     <div class="span10 main-container-right">
+                        <!-- <div class="btn btn-info change-search-mobile" style="width:100%; height:50px; margin-bottom:10px">
+                            <div style="float:left; margin-left:5px;">
+                                <div style="float:left"><div class="dep-city"></div><div>  a  </div><div class="arr-city"></div></div>
+                                </br><div class="number-people" style="float:left"></div>
+                            </div>
+                        </div> -->
                         <div class="well sorting-options">
                             <!-- Sorting options -->
                             <div class="sorting-options-container">
