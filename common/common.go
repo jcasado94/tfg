@@ -11,7 +11,7 @@ const TRANSP_LAN = 1
 const TRANSP_BUS = 2
 
 // DATABASE CONNECTION
-const TRANSACTION_URL = "http://neo4j:k1llm3plz@localhost:7474/db/data"
+const TRANSACTION_URL = "http://neo4j:k1llm3plz!@localhost:7474/db/data"
 
 // TRANSFER TIME (mins)
 const TRANSFER_TIME = 120
