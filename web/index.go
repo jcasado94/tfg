@@ -9,7 +9,7 @@ import (
 type IndexHandler struct{}
 
 func (IndexHandler) renderTemplate(w http.ResponseWriter) {
-	t, _ := template.ParseFiles(common.WEB_HTML_PATH + `index.html`)
+	t, _ := template.ParseFiles(common.GetAbsPath(common.WEB_HTML_PATH + `index.html`))
 	emptyMap := make(map[string]interface{})
 	t.Execute(w, emptyMap)
 }

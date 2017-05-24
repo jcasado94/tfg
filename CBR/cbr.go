@@ -205,7 +205,7 @@ func (h DirectTripsPlat10Handler) ServeHTTP(w http.ResponseWriter, r *http.Reque
 */
 func DirectTrips(year, month, day, adults, children11, children5, infants, depId, arrId string, which int) []common.Trip {
 
-	db, err := neoism.Connect(common.TRANSACTION_URL)
+	db, err := neoism.Connect(common.GetDBTransactionUrl())
 	common.PanicErr(err)
 
 	intDepId, _ := strconv.Atoi(depId)
@@ -251,7 +251,7 @@ func (h *UsualCombinationsHandler) RetrieveGeneralSolutions(year, month, day, de
 	intDepId, _ := strconv.Atoi(depId)
 	intArrId, _ := strconv.Atoi(arrId)
 
-	db, err := neoism.Connect(common.TRANSACTION_URL)
+	db, err := neoism.Connect(common.GetDBTransactionUrl())
 	common.PanicErr(err)
 
 	h.Db = db
@@ -334,7 +334,7 @@ func (h *SameDayCombinationsHandler) RetrieveSpecificSolutions(year, month, day,
 		FETCH ALL SPECS RELS WITH SAME OR OLDER DATE
 	*/
 
-	db, err := neoism.Connect(common.TRANSACTION_URL)
+	db, err := neoism.Connect(common.GetDBTransactionUrl())
 	common.PanicErr(err)
 
 	intDepYear, _ := strconv.Atoi(year)

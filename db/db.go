@@ -14,7 +14,7 @@ type GetDbCitiesHandler struct {
 
 func (h GetDbCitiesHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
-	db, err := neoism.Connect(common.TRANSACTION_URL)
+	db, err := neoism.Connect(common.GetDBTransactionUrl())
 	common.PanicErr(err)
 
 	res0 := []struct {
